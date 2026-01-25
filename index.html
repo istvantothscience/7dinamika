@@ -134,61 +134,66 @@
     </div>
 
     <script>
+// A te saját Google Sheets CSV linked
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQgg81waFHRcbnE_jzWVpxRb4F2F3LppiBklaVIdDaVj7qpT4b1douJwlwbIGpj2Ag1JDFOYl1PcHwY/pub?output=csv';
 
 async function login() {
-  
+    const name = document.getElementById('student-name').value;
+    const pass = document.getElementById('student-pass').value;
+    const status = document.getElementById('status-msg');
 
-        async function login() {
-            const name = document.getElementById('student-name').value;
-            const pass = document.getElementById('student-pass').value;
-            const status = document.getElementById('status-msg');
+    if (!name || !pass) {
+        status.innerText = "HIBA: AZONOSÍTÓ ÉS KÓD SZÜKSÉGES!";
+        status.style.color = "#ff4444";
+        return;
+    }
 
-            if (!name || !pass) {
-                status.innerText = "HIBA: HIÁNYZÓ ADATOK!";
-                status.style.color = "red";
-                return;
-            }
+    status.innerText = "KAPCSOLÓDÁS A NEWTON-1 ADATBANKHOZ...";
+    
+    try {
+        const response = await fetch(CSV_URL);
+        const csvText = await response.text();
+        
+        // CSV sorokra bontása (figyelembe véve az esetleges idézőjeleket)
+        const rows = csvText.split('\n').map(row => row.split(','));
 
-            status.innerText = "KAPCSOLÓDÁS AZ ADATBANKHOZ...";
-            status.style.color = "var(--neon-cyan)";
+        // Keresés: r[0]=Név, r[1]=Jelszó
+        const user = rows.find(r => 
+            r[0] && r[0].trim().toLowerCase() === name.trim().toLowerCase() && 
+            r[1] && r[1].trim() === pass.trim()
+        );
+
+        if (user) {
+            status.innerText = "AZONOSÍTÁS SIKERES. ÜDVÖZÖLJÜK!";
+            status.style.color = "#00ff00";
             
-            try {
-                const response = await fetch(CSV_URL);
-                const csvText = await response.text();
-                const rows = csvText.split('\n').map(row => row.split(','));
-
-                // Keresés a 0. (Név) és 1. (Jelszó) oszlopban
-                const user = rows.find(r => 
-                    r[0] && r[0].trim().toLowerCase() === name.trim().toLowerCase() && 
-                    r[1] && r[1].trim() === pass.trim()
-                );
-
-                if (user) {
-                    status.innerText = "AZONOSÍTÁS SIKERES. ÜDVÖZÖLJÜK!";
-                    status.style.color = "#00ff00";
-                    
-                    // Adatok mentése
-                    localStorage.setItem('currentUser', JSON.stringify({
-                        name: user[0],
-                        level: user[28],
-                        points: user[26]
-                    }));
-                    
-                    // Átirányítás a Küldetésekhez
-                    setTimeout(() => {
-                        window.location.href = "missions.html";
-                    }, 1500);
-                } else {
-                    status.innerText = "HIBA: ISMERETLEN KADÉT VAGY HIBÁS KÓD!";
-                    status.style.color = "red";
-                }
-            } catch (e) {
-                status.innerText = "RENDSZERHIBA: NINCS KAPCSOLAT.";
-                console.error(e);
-            }
+            // ELMENTJÜK AZ ADATOKAT (Az oszlopok a te táblázatod alapján):
+            // r[16] = TotalPoints (Q oszlop)
+            // r[17] = CharacterType (R oszlop)
+            // r[18] = Level (S oszlop)
+            const userData = {
+                name: user[0].trim(),
+                points: user[16] ? user[16].trim() : "0",
+                type: user[17] ? user[17].trim() : "Ismeretlen",
+                level: user[18] ? user[18].trim() : "Cadet"
+            };
+            
+            localStorage.setItem('currentUser', JSON.stringify(userData));
+            
+            setTimeout(() => {
+                window.location.href = "missions.html";
+            }, 1500);
+        } else {
+            status.innerText = "HOZZÁFÉRÉS MEGTAGADVA! ISMERETLEN KADÉT.";
+            status.style.color = "#ff4444";
         }
+    } catch (e) {
+        status.innerText = "RENDSZERHIBA: SIKERTELEN ADATBÁZIS KAPCSOLAT.";
+        console.error(e);
+    }
+}
     </script>
 </body>
 </html>
+
 
