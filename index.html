@@ -4,21 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kepler-452b Mission Control</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
         :root {
             --neon-cyan: #00f2ff;
             --emergency-orange: #ff8c00;
             --deep-space: #0a0b10;
-            --glass-bg: rgba(0, 242, 255, 0.05);
         }
 
         body {
             background-color: var(--deep-space);
-            background-image: 
-                radial-gradient(circle at 50% 50%, rgba(0, 242, 255, 0.1) 0%, transparent 80%),
-                url('https://www.transparenttextures.com/patterns/stardust.png');
+            background-image: radial-gradient(circle at 50% 50%, rgba(0, 242, 255, 0.05) 0%, transparent 80%);
             color: var(--neon-cyan);
             font-family: 'Share Tech Mono', monospace;
             display: flex;
@@ -30,55 +26,58 @@
         }
 
         #terminal-container {
-            width: 400px;
-            padding: 30px;
-            border: 2px solid var(--neon-cyan);
-            background: var(--glass-bg);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 0 20px rgba(0, 242, 255, 0.2);
+            width: 450px;
+            padding: 40px;
+            border: 2px solid var(--emergency-orange);
+            background: rgba(10, 11, 16, 0.85);
+            box-shadow: 0 0 30px rgba(255, 140, 0, 0.2);
             text-align: center;
             position: relative;
         }
 
-        #terminal-container::before {
-            content: "SYSTEM ID: KEPLER-452B-OS";
-            position: absolute;
-            top: -12px;
-            left: 20px;
-            background: var(--deep-space);
-            padding: 0 10px;
-            font-size: 0.8rem;
+        .main-title {
+            font-family: 'Orbitron', sans-serif;
             color: var(--emergency-orange);
+            font-size: 1.8rem;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
         }
 
-        h1 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.5rem;
+        .subtitle {
+            font-size: 0.8rem;
+            color: var(--neon-cyan);
             margin-bottom: 30px;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            color: var(--emergency-orange);
+            opacity: 0.7;
+            letter-spacing: 1px;
         }
 
         .input-group {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             text-align: left;
         }
 
         label {
             display: block;
-            margin-bottom: 5px;
-            font-size: 0.9rem;
+            margin-bottom: 8px;
+            font-size: 0.8rem;
+            color: var(--neon-cyan);
         }
 
         input {
             width: 100%;
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.1);
+            padding: 12px;
+            background: rgba(0, 242, 255, 0.05);
             border: 1px solid var(--neon-cyan);
             color: white;
             font-family: 'Share Tech Mono', monospace;
             box-sizing: border-box;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: var(--emergency-orange);
+            box-shadow: 0 0 10px rgba(255, 140, 0, 0.3);
         }
 
         button {
@@ -91,106 +90,108 @@
             font-weight: bold;
             cursor: pointer;
             transition: 0.3s;
-            text-transform: uppercase;
+            letter-spacing: 2px;
         }
 
         button:hover {
             background: var(--emergency-orange);
             color: var(--deep-space);
-            box-shadow: 0 0 15px var(--emergency-orange);
+            box-shadow: 0 0 20px var(--emergency-orange);
         }
 
         #status-msg {
             margin-top: 20px;
-            font-size: 0.8rem;
-            height: 20px;
+            font-size: 0.9rem;
+            min-height: 20px;
         }
 
         .scanline {
             width: 100%;
-            height: 2px;
-            background: rgba(0, 242, 255, 0.1);
+            height: 100%;
+            background: linear-gradient(to bottom, transparent 50%, rgba(0, 242, 255, 0.02) 50%);
+            background-size: 100% 4px;
             position: absolute;
-            top: 0;
-            left: 0;
+            top: 0; left: 0;
             pointer-events: none;
-            animation: scan 4s linear infinite;
-        }
-
-        @keyframes scan {
-            0% { top: 0; }
-            100% { top: 100%; }
         }
     </style>
 </head>
 <body>
 
-<div id="terminal-container">
-    <div class="scanline"></div>
-    <h1>Mission Control</h1>
-    <p>Newton-1 Túlélő Azonosítás</p>
-    
-    <div class="input-group">
-        <label>SZEMÉLYI AZONOSÍTÓ (NÉV):</label>
-        <input type="text" id="student-name" placeholder="Példa: Kovács János">
+    <div id="terminal-container">
+        <div class="scanline"></div>
+        <h1 class="main-title">Azonosítsa magát kadét</h1>
+        <p class="subtitle">Kepler-452b | Newton-1 túlélő adatbázis</p>
+        
+        <div class="input-group">
+            <label>SZEMÉLYI AZONOSÍTÓ:</label>
+            <input type="text" id="student-name" placeholder="Név beírása...">
+        </div>
+
+        <div class="input-group">
+            <label>HOZZÁFÉRÉSI KÓD:</label>
+            <input type="password" id="student-pass" placeholder="****">
+        </div>
+
+        <button onclick="login()">RENDSZER BELÉPÉS</button>
+
+        <div id="status-msg"></div>
     </div>
 
-    <div class="input-group">
-        <label>HOZZÁFÉRÉSI KÓD (JELSZÓ):</label>
-        <input type="password" id="student-pass" placeholder="****">
-    </div>
+    <script>
+        // Ide írd majd be a Google Sheet-ed CSV linkjét!
+        const CSV_URL = 'IDE_MASOLD_A_CSV_LINKET';
 
-    <button onclick="login()">Rendszer Belépés</button>
+        async function login() {
+            const name = document.getElementById('student-name').value;
+            const pass = document.getElementById('student-pass').value;
+            const status = document.getElementById('status-msg');
 
-    <div id="status-msg"></div>
-</div>
-
-<script>
-    // IDE MÁSOLD MAJD A GOOGLE SHEETS CSV LINKJÉT
-    const CSV_URL = 'IDE_JÖN_A_PUBLIKÁLT_CSV_LINKED';
-
-    async function login() {
-        const name = document.getElementById('student-name').value;
-        const pass = document.getElementById('student-pass').value;
-        const status = document.getElementById('status-msg');
-
-        if (!name || !pass) {
-            status.innerText = "HIBA: Adatok kitöltése kötelező!";
-            status.style.color = "red";
-            return;
-        }
-
-        status.innerText = "Kapcsolódás a Newton-1 adatbankhoz...";
-        status.style.color = "var(--neon-cyan)";
-
-        try {
-            const response = await fetch(CSV_URL);
-            const data = await response.text();
-            
-            // CSV sorokra bontása
-            const rows = data.split('\n').map(row => row.split(','));
-            
-            // Keresés a sorok között (Név: 0. oszlop, Jelszó: 1. oszlop)
-            const student = rows.find(r => r[0].trim() === name && r[1].trim() === pass);
-
-            if (student) {
-                const points = student[26]; // AA oszlop (TotalPoints)
-                const rank = student[28];   // Level oszlop
-                status.innerText = `Üdvözöljük, ${rank}! Belépés engedélyezve.`;
-                status.style.color = "lightgreen";
-                
-                // Itt irányíthatod át a következő oldalra
-                // window.location.href = "sector1.html"; 
-            } else {
-                status.innerText = "HIBA: Ismeretlen azonosító vagy kód!";
-                status.style.color = "red";
+            if (!name || !pass) {
+                status.innerText = "HIBA: AZONOSÍTÓ ÉS KÓD SZÜKSÉGES!";
+                status.style.color = "#ff4444";
+                return;
             }
-        } catch (error) {
-            status.innerText = "RENDSZERHIBA: Nem sikerült elérni az adatbázist.";
-            console.error(error);
-        }
-    }
-</script>
 
+            status.innerText = "ADATOK ELLENŐRZÉSE...";
+            status.style.color = "var(--neon-cyan)";
+            
+            try {
+                const response = await fetch(CSV_URL);
+                const csvText = await response.text();
+                // Egyszerű CSV parzoló (sorok és oszlopok)
+                const rows = csvText.split('\n').map(row => row.split(','));
+
+                // Keresés: r[0] a név, r[1] a jelszó a Google Táblázatban
+                const user = rows.find(r => 
+                    r[0] && r[0].trim().toLowerCase() === name.trim().toLowerCase() && 
+                    r[1] && r[1].trim() === pass.trim()
+                );
+
+                if (user) {
+                    status.innerText = "AZONOSÍTÁS SIKERES. ÜDVÖZÖLJÜK!";
+                    status.style.color = "#00ff00";
+                    
+                    // Adatok mentése a böngészőbe a következő oldalhoz
+                    localStorage.setItem('currentUser', JSON.stringify({
+                        name: user[0],
+                        points: user[26],
+                        type: user[27],
+                        level: user[28]
+                    }));
+                    
+                    setTimeout(() => {
+                        window.location.href = "missions.html";
+                    }, 1500);
+                } else {
+                    status.innerText = "HOZZÁFÉRÉS MEGTAGADVA! ISMERETLEN KADÉT.";
+                    status.style.color = "#ff4444";
+                }
+            } catch (e) {
+                status.innerText = "RENDSZERHIBA: KAPCSOLATI HIBA AZ ADATBÁZISSAL.";
+                console.error(e);
+            }
+        }
+    </script>
 </body>
 </html>
