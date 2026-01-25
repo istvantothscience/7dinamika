@@ -139,14 +139,22 @@
     </div>
 
     <script>
-        // Felhasználó betöltése
-        const userData = JSON.parse(localStorage.getItem('currentUser'));
-        if (!userData) {
-            window.location.href = "index.html";
-        } else {
-            document.getElementById('user-name').innerText = userData.name.toUpperCase();
-        }
+   const userData = JSON.parse(localStorage.getItem('currentUser'));
+
+if (!userData) {
+    window.location.href = "index.html";
+} else {
+    // Megjelenítjük a nevet, a rangot és a kasztot is
+    document.getElementById('user-name').innerText = 
+        `${userData.name.toUpperCase()} [${userData.type.toUpperCase()}]`;
+    
+    // Ha van rang kijelződ:
+    if(document.getElementById('display-level')) {
+        document.getElementById('display-level').innerText = userData.level;
+    }
+}
     </script>
 
 </body>
+
 </html>
