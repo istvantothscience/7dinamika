@@ -2,43 +2,169 @@
 <html lang="hu">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kepler-452b - Mellékküldetések</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
-        :root { --cyan: #00f2ff; --orange: #ff8c00; --bg: #0a0b10; --locked: #222; }
-        body { background: var(--bg); color: var(--cyan); font-family: 'Share Tech Mono', monospace; padding: 20px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; max-width: 1200px; margin: 40px auto; }
-        .card { padding: 20px; border: 2px solid var(--cyan); background: rgba(0, 242, 255, 0.05); text-align: center; transition: 0.3s; }
-        .card.locked { border-color: var(--locked); color: #444; filter: grayscale(1); opacity: 0.5; }
-        .btn { display: block; margin-top: 15px; padding: 10px; border: 1px solid var(--cyan); color: var(--cyan); text-decoration: none; font-family: 'Orbitron'; }
-        .locked .btn { border-color: #444; color: #444; pointer-events: none; }
+        :root {
+            --cyan: #00f2ff;
+            --orange: #ff8c00;
+            --bg: #0a0b10;
+            --locked: #1a1b25;
+        }
+
+        body {
+            background-color: var(--bg);
+            background-image: radial-gradient(circle at 50% 50%, rgba(0, 242, 255, 0.05) 0%, transparent 90%);
+            color: var(--cyan);
+            font-family: 'Share Tech Mono', monospace;
+            margin: 0;
+            padding: 40px;
+        }
+
+        h1 {
+            text-align: center;
+            font-family: 'Orbitron';
+            color: var(--orange);
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            margin-bottom: 50px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: rgba(0, 242, 255, 0.03);
+            border: 1px solid var(--cyan);
+            padding: 25px;
+            position: relative;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .card:hover:not(.locked) {
+            background: rgba(0, 242, 255, 0.08);
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.2);
+            transform: translateY(-5px);
+        }
+
+        /* Zárolt kártya stílusa */
+        .card.locked {
+            border-color: #333;
+            background: var(--locked);
+            color: #555;
+            filter: grayscale(1);
+        }
+
+        .card h3 {
+            font-family: 'Orbitron';
+            margin-top: 0;
+            color: var(--cyan);
+        }
+
+        .locked h3 { color: #555; }
+
+        .mission-title {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: var(--orange);
+        }
+
+        .status-badge {
+            font-size: 0.7rem;
+            padding: 3px 8px;
+            border: 1px solid;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+
+        .btn {
+            display: block;
+            text-align: center;
+            padding: 12px;
+            text-decoration: none;
+            font-family: 'Orbitron';
+            font-weight: bold;
+            border: 1px solid var(--cyan);
+            color: var(--cyan);
+            transition: 0.3s;
+            margin-top: 20px;
+        }
+
+        .card:not(.locked) .btn:hover {
+            background: var(--cyan);
+            color: var(--bg);
+        }
+
+        .locked .btn {
+            border-color: #333;
+            color: #333;
+            cursor: not-allowed;
+        }
+
+        .lock-icon {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 1.5rem;
+        }
     </style>
 </head>
 <body>
-    <h1 style="text-align:center; font-family: 'Orbitron'; color: var(--orange);">MELLÉKKÜLDETÉSEK</h1>
-    <div class="grid" id="side-grid"></div>
+
+    <header style="margin-bottom: 30px;">
+        <a href="missions.html" style="color: var(--cyan); text-decoration: none;">< VISSZA A PARANCSNOKSÁGRA</a>
+    </header>
+
+    <h1>Mellékküldetések</h1>
+
+    <div class="grid" id="side-grid">
+        </div>
 
     <script>
-        const userData = JSON.parse(localStorage.getItem('currentUser'));
-        const points = parseInt(userData.points);
+        // Adatok lekérése (pontszám ellenőrzéséhez)
+        const userData = JSON.parse(localStorage.getItem('currentUser')) || { points: 0 };
+        const userPoints = parseInt(userData.points) || 0;
 
+        // A 6 mellékküldetés definíciója
         const sideMissions = [
-            { id: 1, name: "S.M. 01", title: "TESZT: ERŐTAN", limit: 0, link: "sm1_test.html" },
-            { id: 2, name: "S.M. 02", title: "SZIMULÁCIÓ: DÜNE", limit: 10, link: "sm2_sim.html" },
-            { id: 3, name: "S.M. 03", title: "KAPCSOLAT: AZ AI", limit: 20, link: "sm3_chat.html" }
+            { id: 1, name: "S.M. 01", title: "ERŐMÉRŐ TESZT", limit: 0, desc: "Alapszintű diagnosztika az erő fogalmáról.", link: "sm1_test.html" },
+            { id: 2, name: "S.M. 02", title: "GRAVITÁCIÓS SZIMULÁCIÓ", limit: 10, desc: "A Kepler-452b vonzerejének mérése.", link: "sm2_sim.html" },
+            { id: 3, name: "S.M. 03", title: "AI ADATBÁNYÁSZAT", desc: "Beszélj a robottal és tudd meg a titkos kódot!", limit: 20, link: "sm3_chat.html" },
+            { id: 4, name: "S.M. 04", title: "TEHETETLENSÉGI MODUL", limit: 30, desc: "Newton I. törvényének gyakorlati alkalmazása.", link: "sm4_inertia.html" },
+            { id: 5, name: "S.M. 05", title: "SÚRLÓDÁSI EGYÜTTHATÓ", limit: 40, desc: "A talajminták csúszási ellenállásának mérése.", link: "sm5_friction.html" },
+            { id: 6, name: "S.M. 06", title: "ZÁRÓ VÉGELENŐRZÉS", limit: 50, desc: "Komplex fizikai szimuláció a hazatéréshez.", link: "sm6_final.html" }
         ];
 
         const grid = document.getElementById('side-grid');
-        sideMissions.forEach(m => {
-            const isLocked = points < m.limit;
-            grid.innerHTML += `
+
+        sideMissions.forEach(mission => {
+            const isLocked = userPoints < mission.limit;
+            
+            const cardHTML = `
                 <div class="card ${isLocked ? 'locked' : ''}">
-                    <h3>${m.name}</h3>
-                    <p>${m.title}</p>
-                    <small>Szükséges: ${m.limit} PT</small>
-                    <a href="${isLocked ? '#' : m.link}" class="btn">${isLocked ? 'ZÁROLT' : 'INDÍTÁS'}</a>
+                    <div class="status-badge">${isLocked ? 'ZÁROLT' : 'ELÉRHETŐ'}</div>
+                    <h3>${mission.name}</h3>
+                    <div class="mission-title">${mission.title}</div>
+                    <p style="font-size: 0.8rem; opacity: 0.8;">${mission.desc}</p>
+                    <div style="font-size: 0.7rem; margin-top: 10px;">
+                        KÖVETELMÉNY: ${mission.limit} PT 
+                        ${isLocked ? `(Még ${mission.limit - userPoints} PT szükséges)` : ''}
+                    </div>
+                    <a href="${isLocked ? '#' : mission.link}" class="btn">
+                        ${isLocked ? 'ZÁROLT ADATOK' : 'KÜLDETÉS INDÍTÁSA'}
+                    </a>
                 </div>
             `;
+            grid.innerHTML += cardHTML;
         });
     </script>
 </body>
