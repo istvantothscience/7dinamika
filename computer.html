@@ -168,7 +168,8 @@ FIZIKAI TUDÁSBÁZIS:
 3. INTERAKCIÓ: Ha a diák eredményt közöl, ellenőrizd. Ha téved, ne hibáztasd, hanem vezess rá a helyes képletre (pl. a = F/m) egy szellemes megjegyzés kíséretében.
 
 FONTOS: Sose használj sértő vagy durva kifejezéseket. A humorod legyen abszurd és intellektuális.`;
-async function sendMessage() {
+
+    async function sendMessage() {
     const input = document.getElementById('user-input');
     const text = input.value.trim();
     if (!text) return;
@@ -176,34 +177,48 @@ async function sendMessage() {
     displayMessage(text, 'user-msg');
     input.value = '';
 
+    // Ezt a biztonsági beállítást adjuk hozzá, hogy ne blokkoljon a Google szűrője
+    const requestBody = {
+        contents: [{
+            parts: [{ text: SYSTEM_PROMPT + "\n\nKérdés: " + text }]
+        }],
+        safetySettings: [
+            { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
+            { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
+            { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" },
+            { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" }
+        ]
+    };
+
     try {
         const response = await fetch(API_URL, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [{ parts: [{ text: SYSTEM_PROMPT + "\n\nKérdés: " + text }] }]
-            })
+            // Fontos: a headers rész így legyen pontosan!
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestBody)
         });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error ? errorData.error.message : "Ismeretlen hiba");
+        }
 
         const data = await response.json();
         
-        // Ha hiba van a válaszban
-        if (data.error) {
-            displayMessage("GALAKTIKUS HIBA: " + data.error.message, 'ai-msg');
-            console.log(data.error);
-            return;
-        }
-
-        // A válasz kinyerése a stabil API struktúrából
         if (data.candidates && data.candidates[0].content) {
             const aiText = data.candidates[0].content.parts[0].text;
             displayMessage(aiText, 'ai-msg');
         } else {
-            displayMessage("A gép hallgat... (Üres válasz érkezett)", 'ai-msg');
+            // Ha a Google letiltja a választ (pl. túl cinikusnak ítéli)
+            displayMessage("A gép hallgat... A biztonsági protokollok blokkolták a választ.", 'ai-msg');
         }
 
     } catch (e) {
-        displayMessage("Hiba történt: " + e.message, 'ai-msg');
+        // Most már ki fogja írni a pontos hibaüzenetet (pl. invalid key)
+        displayMessage("HIBAÜZENET: " + e.message, 'ai-msg');
+        console.error("Részletes hiba:", e);
     }
 }
 
