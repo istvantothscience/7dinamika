@@ -149,9 +149,8 @@
 </div>
 
 <script>
-    // ELLENŐRIZD EZT A KULCSOT: Ha nem működik, generálj egy újat az AI Studioban!
     const API_KEY = "AIzaSyBVVGUb0squnQlorx4hnObWdkfG3FAnLU8"; 
-    const API_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
     
    const SYSTEM_PROMPT = `Te vagy Mély Gondolat Jr., a Kepler-452b misszió fedélzeti főszámítógépe. 
 
@@ -169,7 +168,7 @@ FIZIKAI TUDÁSBÁZIS:
 
 FONTOS: Sose használj sértő vagy durva kifejezéseket. A humorod legyen abszurd és intellektuális.`;
 
-    async function sendMessage() {
+ async function sendMessage() {
     const input = document.getElementById('user-input');
     const text = input.value.trim();
     if (!text) return;
@@ -177,48 +176,36 @@ FONTOS: Sose használj sértő vagy durva kifejezéseket. A humorod legyen abszu
     displayMessage(text, 'user-msg');
     input.value = '';
 
-    // Ezt a biztonsági beállítást adjuk hozzá, hogy ne blokkoljon a Google szűrője
     const requestBody = {
         contents: [{
             parts: [{ text: SYSTEM_PROMPT + "\n\nKérdés: " + text }]
-        }],
-        safetySettings: [
-            { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
-            { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
-            { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" },
-            { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" }
-        ]
+        }]
     };
 
     try {
         const response = await fetch(API_URL, {
             method: 'POST',
-            // Fontos: a headers rész így legyen pontosan!
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(requestBody)
         });
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error ? errorData.error.message : "Ismeretlen hiba");
+        const data = await response.json();
+
+        if (data.error) {
+            // Itt ki fogja írni, ha a kulcs vagy a helyszín a gond
+            displayMessage("RENDSZER-ÜZENET: " + data.error.message, 'ai-msg');
+            return;
         }
 
-        const data = await response.json();
-        
         if (data.candidates && data.candidates[0].content) {
             const aiText = data.candidates[0].content.parts[0].text;
             displayMessage(aiText, 'ai-msg');
         } else {
-            // Ha a Google letiltja a választ (pl. túl cinikusnak ítéli)
-            displayMessage("A gép hallgat... A biztonsági protokollok blokkolták a választ.", 'ai-msg');
+            displayMessage("A gép néma marad... Próbálja meg másképp fogalmazni.", 'ai-msg');
         }
 
     } catch (e) {
-        // Most már ki fogja írni a pontos hibaüzenetet (pl. invalid key)
-        displayMessage("HIBAÜZENET: " + e.message, 'ai-msg');
-        console.error("Részletes hiba:", e);
+        displayMessage("HIBA: " + e.message, 'ai-msg');
     }
 }
 
