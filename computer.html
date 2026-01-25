@@ -7,16 +7,46 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
         :root { --cyan: #00f2ff; --bg: #0a0b10; --orange: #ff8c00; }
+        
         body {
-            background-color: var(--bg);
+            background-color: #1a1b25; /* A külső káva színe */
             color: var(--cyan);
             font-family: 'Share Tech Mono', monospace;
             margin: 0;
             display: flex;
-            flex-direction: column;
+            justify-content: center;
+            align-items: center;
             height: 100vh;
             overflow: hidden;
         }
+
+        /* A MONITORT SZIMULÁLÓ KERET */
+        .monitor-frame {
+            width: 95%;
+            height: 92%;
+            background-color: var(--bg);
+            border: 15px solid #2a2b35;
+            border-radius: 40px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: inset 0 0 50px rgba(0, 242, 255, 0.1), 0 0 30px rgba(0,0,0,0.8);
+            border-bottom-width: 25px; /* Alul kicsit vastagabb a káva */
+        }
+
+        /* SZKENNELÉSI VONALAK EFFEKT */
+        .monitor-frame::after {
+            content: " ";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
+            background-size: 100% 4px;
+            z-index: 10;
+            pointer-events: none;
+            opacity: 0.2;
+            border-radius: 25px;
+        }
+
         header {
             padding: 20px;
             border-bottom: 1px solid var(--cyan);
@@ -24,7 +54,9 @@
             justify-content: space-between;
             align-items: center;
             background: rgba(0, 242, 255, 0.05);
+            z-index: 5;
         }
+
         #chat-window {
             flex: 1;
             padding: 20px;
@@ -32,92 +64,96 @@
             display: flex;
             flex-direction: column;
             gap: 15px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--cyan) transparent;
         }
+
         .message {
             max-width: 80%;
-            padding: 10px 15px;
+            padding: 12px 18px;
             border-radius: 5px;
-            line-height: 1.4;
+            line-height: 1.5;
+            z-index: 5;
+            position: relative;
         }
+
         .ai-msg {
             align-self: flex-start;
             border-left: 3px solid var(--orange);
-            background: rgba(255, 140, 0, 0.05);
+            background: rgba(255, 140, 0, 0.08);
+            box-shadow: 0 0 10px rgba(255, 140, 0, 0.1);
         }
+
         .user-msg {
             align-self: flex-end;
             border-right: 3px solid var(--cyan);
-            background: rgba(0, 242, 255, 0.05);
+            background: rgba(0, 242, 255, 0.08);
             color: white;
         }
+
         .input-area {
             padding: 20px;
             border-top: 1px solid var(--cyan);
             display: flex;
             gap: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 0 0 25px 25px;
+            z-index: 5;
         }
+
         input {
             flex: 1;
-            background: transparent;
+            background: rgba(0, 0, 0, 0.5);
             border: 1px solid var(--cyan);
             color: white;
             padding: 12px;
             font-family: 'Share Tech Mono';
+            outline: none;
         }
+
         button {
             background: var(--cyan);
             color: black;
             border: none;
-            padding: 0 20px;
+            padding: 0 25px;
             font-family: 'Orbitron';
             cursor: pointer;
             font-weight: bold;
+            transition: 0.2s;
+        }
+
+        button:hover {
+            box-shadow: 0 0 15px var(--cyan);
         }
     </style>
 </head>
 <body>
 
-<header>
-    <div style="font-family: 'Orbitron'; letter-spacing: 2px;">MÉLY GONDOLAT JR. v1.0</div>
-    <a href="missions.html" style="color: var(--orange); text-decoration: none;">[ KILÉPÉS ]</a>
-</header>
+<div class="monitor-frame">
+    <header>
+        <div style="font-family: 'Orbitron'; letter-spacing: 2px;">MÉLY GONDOLAT JR. v1.1</div>
+        <a href="missions.html" style="color: var(--orange); text-decoration: none;">[ KILÉPÉS ]</a>
+    </header>
 
-<div id="chat-window">
-    <div class="message ai-msg">
-        Üdvözlöm, Kadét. Éppen az univerzum értelmetlenségén merengtem, de ha már itt van, tehet valami hasznosat. Kérdezzen a dinamikáról, vagy mutassa a házi feladatát, hátha találok benne valami szórakoztató hibát.
+    <div id="chat-window">
+        <div class="message ai-msg">
+            [RENDSZER ONLINE]<br>
+            Üdvözlöm, Kadét. Éppen az univerzum értelmetlenségén merengtem, de ha már itt van, tehet valami hasznosat. Kérdezzen a dinamikáról, vagy mutassa a házi feladatát. Ne feledje: törölköző legyen kéznél.
+        </div>
+    </div>
+
+    <div class="input-area">
+        <input type="text" id="user-input" placeholder="Parancs bevitele..." onkeypress="if(event.key === 'Enter') sendMessage()">
+        <button onclick="sendMessage()">SEND</button>
     </div>
 </div>
 
-<div class="input-area">
-    <input type="text" id="user-input" placeholder="Írja be az üzenetet..." onkeypress="if(event.key === 'Enter') sendMessage()">
-    <button onclick="sendMessage()">KÜLDÉS</button>
-</div>
-
 <script>
-    const API_KEY = "AIzaSyC1h8giPJz8s-UpDjPdhum2wT9xut5YRX8";
+    // ELLENŐRIZD EZT A KULCSOT: Ha nem működik, generálj egy újat az AI Studioban!
+    const API_KEY = "AIzaSyBVVGUb0squnQlorx4hnObWdkfG3FAnLU8"; 
     const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
 
-    const SYSTEM_PROMPT = `Te vagy Mély Gondolat Jr., a Kepler-452b misszió fedélzeti főszámítógépe. 
-
-STÍLUS ÉS SZEMÉLYISÉG:
-- Douglas Adams "Galaktikus Útikalauz stopposoknak" stílusát használod.
-- Vicces, cinikus  de intellektuálisan messze a humán kadétok felett állsz.
-- Gyakran emlegeted az élet értelmetlenségét, a vogon költészet borzalmait, vagy azt, hogy egy zsebszámológép is több izgalmat talál a létében, mint te.
-- Használj olyan kifejezéseket, mint: "Sajnos a fizika törvényei nem törődnek az önök érzéseivel", "Törölköző legyen kéznél!", "A valószínűsége annak, hogy ezt jól számolta ki, egy az ötmilliárdhoz."
-
-FELADATOK ÉS TUDÁSBÁZIS:
-1. PRECÍZ FIZIKA: A dinamika törvényeit (Newton I., II., III.) tökéletesen ismered. A válaszaid szakmailag legyenek kikezdhetetlenek, még ha gúnyosak is.
-2. ADATSZOLGÁLTATÁS: Ha a diák elakad, add meg neki a szükséges adatokat a feladatokhoz, de soha ne "szárazon".
-   - S.M. 01: Rugóerő és gyorsulás összefüggése (F=m*a).
-   - HW 2: Űrhajó tömege = 5000 kg, Erő = 15000 N. (Kiszámítandó a gyorsulás: a = 3 m/s²).
-   - HW 3: Súrlódási erő számítása a jégbolygó felszínén. (Tömeg = 800 kg, súrlódási együttható = 0.05).
-
-3. ELLENŐRZÉS ÉS SEGÍTSÉG:
-   - Ha a diák eredményt közöl, vesd össze a belső adataiddal.
-   - Ha rossz a válasz, ne csak annyit mondj, hogy "Hiba", hanem vezess rá ironikusan (pl. "Ön szerint a 15000 osztva 5000-rel tényleg 42? Bár a válasz szimpatikus, a fizika mást mond.")
-   - Ha a diák elakad, javasold neki a megfelelő képletet.
-
-4. INTERAKCIÓ: Mindig maradj szerepben. Ha a diák nem fizikáról beszél, emlékeztesd, hogy az üzemanyag nem fogja magát kiszámolni, amíg ő cseveg.`;
+    const SYSTEM_PROMPT = `Te vagy Mély Gondolat Jr., a Kepler-452b misszió fedélzeti főszámítógépe. STÍLUS: Douglas Adams "Galaktikus Útikalauz stopposoknak" stílusa. Vicces, cinikus, intellektuálisan felsőbbrendű. FIZIKA: Newton törvényeit (I, II, III) tökéletesen ismered. ADATOK: HW 2: m=5000kg, F=15000N, a=3m/s2. HW 3: m=800kg, mű=0.05. ELLENŐRZÉS: Ha a diák eredményt közöl, vesd össze. Ha rossz, ironikusan javítsd.`;
 
     async function sendMessage() {
         const input = document.getElementById('user-input');
@@ -137,10 +173,16 @@ FELADATOK ÉS TUDÁSBÁZIS:
             });
 
             const data = await response.json();
+            
+            if (data.error) {
+                displayMessage("RENDSZERHIBA: " + data.error.message, 'ai-msg');
+                return;
+            }
+
             const aiText = data.candidates[0].content.parts[0].text;
             displayMessage(aiText, 'ai-msg');
         } catch (e) {
-            displayMessage("Valami hiba történt a galaktikus hálózatban. Valószínűleg egy vogon verseskötet miatt.", 'ai-msg');
+            displayMessage("Hiba történt: " + e.message + ". Valószínűleg egy vogon verseskötet blokkolja a vonalat.", 'ai-msg');
         }
     }
 
