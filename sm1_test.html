@@ -303,11 +303,20 @@
     }
 
     function sendPoints(points, missionId) {
-        const userData = JSON.parse(localStorage.getItem('currentUser'));
-        if(!userData || !SCRIPT_URL) {
-            console.error("Hiba: Nincs bejelentkezett felhasználó vagy SCRIPT_URL!");
-            return;
-        }
+    const userData = JSON.parse(localStorage.getItem('currentUser'));
+    // Itt is fontos a SCRIPT_URL megléte!
+    if(!userData || !SCRIPT_URL) return;
+
+    // Ebben a sorban adjuk hozzá a &mission= részt az URL-hez
+    const finalUrl = `${SCRIPT_URL}?name=${encodeURIComponent(userData.name)}&points=${points}&mission=${missionId}`;
+
+    fetch(finalUrl, {
+        method: 'GET',
+        mode: 'no-cors'
+    })
+    .then(() => alert("ADATOK SZINKRONIZÁLVA!"))
+    .catch(err => console.error("Hiba:", err));
+}
 
         const finalUrl = `${SCRIPT_URL}?name=${encodeURIComponent(userData.name)}&points=${points}&mission=${missionId}`;
 
@@ -324,4 +333,5 @@
 
 </body>
 </html>
+
 
