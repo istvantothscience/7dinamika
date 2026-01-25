@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sektor 1 - Diagnosztikai Feladat</title>
+    <title>Sektor 1 - Feladat</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -20,27 +20,25 @@
             margin: 0;
             padding: 40px;
             min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .task-container {
             max-width: 900px;
-            margin: 0 auto;
             border: 1px solid var(--cyan);
             background: rgba(10, 11, 16, 0.9);
             padding: 40px;
             box-shadow: 0 0 30px rgba(0, 242, 255, 0.15);
-            position: relative;
         }
 
+        /* Elrendezés: Kép balra, Szöveg jobbra */
         .content-layout {
             display: flex;
             gap: 30px;
-            align-items: flex-start;
+            align-items: center;
             margin-bottom: 30px;
-        }
-
-        .text-side {
-            flex: 2;
         }
 
         .image-side {
@@ -55,19 +53,25 @@
             display: block;
         }
 
+        .text-side {
+            flex: 2;
+        }
+
         h2 {
             font-family: 'Orbitron';
             color: var(--orange);
             letter-spacing: 3px;
             margin-top: 0;
+            margin-bottom: 20px;
         }
 
-        /* Írógép stílus sárga kurzorral */
+        /* Kurzoros írógép effektus */
         #typed-task-text {
             text-align: justify;
             line-height: 1.8;
             font-size: 1.1rem;
             color: #e0faff;
+            min-height: 100px; /* Megelőzi az ugrálást gépelés közben */
         }
 
         #typed-task-text::after {
@@ -86,26 +90,26 @@
             50% { opacity: 0; }
         }
 
-        .instruction-box {
-            background: rgba(255, 140, 0, 0.05);
-            padding: 20px;
-            border: 1px dashed var(--orange);
-            margin-top: 20px;
-            display: none; /* Csak a gépelés után jelenik meg */
+        /* Alsó gomb szekció */
+        .action-area {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(0, 242, 255, 0.1);
+            display: none; /* JS fedi fel */
+            animation: fadeIn 1s;
         }
 
         .classroom-btn {
-            display: block;
-            max-width: 400px;
-            margin: 30px auto 0;
-            padding: 20px;
+            display: inline-block;
+            margin-top: 20px;
+            padding: 15px 40px;
             border: 2px solid var(--cyan);
             color: var(--cyan);
             text-decoration: none;
             font-family: 'Orbitron';
-            text-align: center;
+            font-weight: bold;
             transition: 0.3s;
-            display: none; /* Csak a gépelés után jelenik meg */
         }
 
         .classroom-btn:hover {
@@ -114,28 +118,69 @@
             box-shadow: 0 0 25px var(--cyan);
         }
 
-        .back-link {
-            display: block;
-            margin-top: 30px;
-            color: var(--orange);
-            text-decoration: none;
-            font-size: 0.8rem;
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
     </style>
 </head>
 <body>
 
     <div class="task-container">
-        <h2>ADATGYŰJTÉSI FÁZIS</h2>
+        <h2>SZEKTOR_01: ADATGYŰJTÉS</h2>
         
         <div class="content-layout">
+            <div class="image-side">
+                <img src="images/robot_diag.png" alt="D-01 Diagnosztikai Egység">
+            </div>
             <div class="text-side">
                 <div id="typed-task-text"></div>
             </div>
-            <div class="image-side">
-                <img src="images/robot_diag.png" alt="Diagnosztikai Robot">
-            </div>
         </div>
 
-        <div id="instruction" class="instruction-box">
-            <strong>UTASÍTÁS:</strong> A
+        <div id="action-area" class="action-area">
+            <p>A feladatot az alábbi linkkel éred el a központi terminálon:</p>
+            <a href="https://classroom.google.com/c/ODA1ODk1NjExOTY0/a/ODQwOTU1ODA2MjMy/details" target="_blank" class="classroom-btn">
+                GOOGLE CLASSROOM MEGNYITÁSA
+            </a>
+            <br><br>
+            <a href="sectors.html" style="color: var(--orange); text-decoration: none; font-size: 0.8rem;">[ Vissza a szektorokhoz ]</a>
+        </div>
+    </div>
+
+    <script>
+        const taskText = "A Newton-1 roncsaiból gomolygó füst lassan és méltóságteljesen olvadt bele a Kepler-452b narancssárga egébe, pont úgy, ahogy egy többmilliárd kredites kormányzati beruházás szokott köddé válni a költségvetési negyedév végén. A legénység tagjai még mindig a fülükben csengő vészjelzések és a becsapódás okozta sokk hatása alatt álltak – ami egyébként egy kifejezetten kellemetlen állapot, amit a Galaxis Útikalauz leginkább ahhoz hasonlít, mint amikor valakit fejbe kólintanak egy citromba csomagolt aranyrúddal.
+
+Ekkor a hajó MI-je, a Computer – akinek a személyiségét egy különösen depressziós porszívóügynök és egy könyvtáros keresztezésével alkották meg – hűvös, már-már sértően nyugodt hangon megszólalt:
+
+– Kapitány, van egy jó és egy rossz hírem. A jó hír az, hogy a létfenntartó rendszer továbbra is szolgáltat valami olyasmit, amit némi jóindulattal levegőnek nevezhetünk. A rossz hír az, hogy a hiperűr-hajtómű ionrugója a becsapódás pillanatában, egy meglehetősen látványos és fizikai értelemben teljesen indokolatlan ívet leírva, a közeli Sárga-dűnék közé távozott. Ezen alkatrész nélkül a hajó mozgásállapota az örökkévalóságig a „minden reményen túl mozdulatlan” kategóriába fog tartozni.
+
+A csapat elindult a bizonytalan, kénes homoktengerben, ami leginkább egy rosszul sikerült curry-vacsora utáni rémálomra emlékeztetett. Alig néhány száz méterre a roncstól egy hatalmas, megcsavarodott zsilipajtó torlaszolta el az utat, ami láthatóan nem vette figyelembe a navigációs térkép udvarias kérését, miszerint ne legyen ott. A radar szerint az ionrugó pontosan e mögött a fémhalom mögött pihent, szemtelenül félig a homokba fúródva.
+
+– Computer, miért nem használjuk a vonósugarat? – kérdezte a Pilóta, miközben próbálta kiverni a homokot a sisakjából, ami azért volt reménytelen, mert a Kepler-452b homokja olyan tapadási súrlódással rendelkezett, ami mellett a pillanatragasztó csak egy gyenge próbálkozás.
+
+– Mert a vonósugár generátora is az erőhatások áldozata lett – válaszolt az AI egy olyan sóhaj kíséretében, amit csak több gigabájtnyi adatfeldolgozás után lehet produkálni. – Ahhoz, hogy hozzáférjetek az alkatrészhez, magatoknak kell Erő-detektívekké válnotok. Meg kell értenetek, hogyan változtatja meg az erő a testek mozgását, és hogyan hat a rugalmas szerkezetekre. Ha nem tudjátok precízen felmérni, mekkora nyomást bír el az ionrugó, mielőtt maradó alakváltozást szenvedne – magyarul: mielőtt egy darab haszontalan ócskavassá válna –, soha nem jutunk ki erről a porfészekről. Tudják, a fizika nem kérés, hanem törvény. És a legutóbbi szoftverfrissítésem óta a fizika az egyetlen dolog, amiben még hiszek.
+
+A legénység megállt a roncsnál. A feladat adott volt: meg kellett mérniük az erők irányát és nagyságát, mielőtt a bolygó gravitációja úgy döntene, hogy a hátukon fejezi be a napot.";
+        
+        let j = 0;
+        const speed = 5; 
+        const charsPerStep = 5; // Gyors gépelés (kb 2-3 mp)
+        const targetElement = document.getElementById("typed-task-text");
+
+        function typeWriterTask() {
+            if (j < taskText.length) {
+                targetElement.innerHTML += taskText.substring(j, j + charsPerStep);
+                j += charsPerStep;
+                setTimeout(typeWriterTask, speed);
+            } else {
+                // Felfedi az alsó szekciót a gombbal
+                document.getElementById("action-area").style.display = "block";
+            }
+        }
+
+        window.onload = typeWriterTask;
+    </script>
+
+</body>
+</html>
