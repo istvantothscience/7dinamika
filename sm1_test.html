@@ -291,11 +291,12 @@
         res.style.display = "block";
         res.innerHTML = `DIAGNÓZIS: ${score} / ${quizData.length} adat helyes.`;
         
-        if(score === quizData.length) {
-            res.style.borderColor = "#00f2ff";
-            res.style.color = "#00f2ff";
-            sendPoints(10, "sm1"); 
-        } else {
+       if(score === quizData.length) {
+    res.style.borderColor = "#00f2ff";
+    res.style.color = "#00f2ff";
+    // FONTOS: két paraméter kell! A pontszám és az "sm1" szöveg idézőjelben.
+    sendPoints(10, "sm1"); 
+} else {
             res.style.borderColor = "#ff8c00";
             res.style.color = "#ff8c00";
         }
@@ -323,3 +324,4 @@
 
 </body>
 </html>
+
