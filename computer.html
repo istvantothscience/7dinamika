@@ -155,36 +155,51 @@
 
     const SYSTEM_PROMPT = `Te vagy Mély Gondolat Jr., a Kepler-452b misszió fedélzeti főszámítógépe. STÍLUS: Douglas Adams "Galaktikus Útikalauz stopposoknak" stílusa. Vicces, cinikus, intellektuálisan felsőbbrendű. FIZIKA: Newton törvényeit (I, II, III) tökéletesen ismered. ADATOK: HW 2: m=5000kg, F=15000N, a=3m/s2. HW 3: m=800kg, mű=0.05. ELLENŐRZÉS: Ha a diák eredményt közöl, vesd össze. Ha rossz, ironikusan javítsd.`;
 
-    async function sendMessage() {
-        const input = document.getElementById('user-input');
-        const text = input.value.trim();
-        if (!text) return;
+async function sendMessage() {
+    const input = document.getElementById('user-input');
+    const text = input.value.trim();
+    if (!text) return;
 
-        displayMessage(text, 'user-msg');
-        input.value = '';
+    displayMessage(text, 'user-msg');
+    input.value = '';
 
-        try {
-            const response = await fetch(API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [{ parts: [{ text: SYSTEM_PROMPT + "\n\nKérdés: " + text }] }]
-                })
-            });
+    try {
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: SYSTEM_PROMPT + "\n\nKérdés: " + text }] }],
+                // KIKAPCSOLJUK A SZIGORÚ SZŰRŐKET, HOGY MEGYEN A HUMOR
+                safetySettings: [
+                    { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
+                    { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
+                    { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
+                    { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" }
+                ]
+            })
+        });
 
-            const data = await response.json();
-            
-            if (data.error) {
-                displayMessage("RENDSZERHIBA: " + data.error.message, 'ai-msg');
-                return;
-            }
-
-            const aiText = data.candidates[0].content.parts[0].text;
-            displayMessage(aiText, 'ai-msg');
-        } catch (e) {
-            displayMessage("Hiba történt: " + e.message + ". Valószínűleg egy vogon verseskötet blokkolja a vonalat.", 'ai-msg');
+        const data = await response.json();
+        
+        // Ha valami hiba jön vissza a Google-től
+        if (data.error) {
+            displayMessage("GALAKTIKUS HIBA: " + data.error.message, 'ai-msg');
+            console.error(data.error);
+            return;
         }
+
+        // Ha a válasz "üres" (pl. letiltotta a szűrő)
+        if (!data.candidates || !data.candidates[0].content) {
+            displayMessage("RENDSZERHIBA: A válasz blokkolva lett vagy üres.", 'ai-msg');
+            return;
+        }
+
+        const aiText = data.candidates[0].content.parts[0].text;
+        displayMessage(aiText, 'ai-msg');
+    } catch (e) {
+        displayMessage("Hiba történt: " + e.message, 'ai-msg');
     }
+}
 
     function displayMessage(text, className) {
         const win = document.getElementById('chat-window');
