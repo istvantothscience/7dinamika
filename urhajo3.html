@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ionrugós hipertérugrás - S.M. 01</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --cyan: #00f2ff;
+            --orange: #ff8c00;
+            --bg: #0a0b10;
+        }
+
+        body {
+            font-family: 'Share Tech Mono', monospace;
+            background-color: var(--bg);
+            color: var(--cyan);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .mission-container {
+            max-width: 950px;
+            width: 100%;
+            background: rgba(10, 11, 16, 0.95);
+            border: 1px solid var(--cyan);
+            padding: 30px;
+            box-shadow: 0 0 30px rgba(0, 242, 255, 0.1);
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 2px solid var(--orange);
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+        }
+
+        h1 { font-family: 'Orbitron'; color: var(--orange); letter-spacing: 2px; }
+
+        .simulation-viewport {
+            width: 100%;
+            height: 350px;
+            background: #000;
+            border: 2px solid #333;
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        #simCanvas { width: 100%; height: 100%; display: block; }
+
+        .control-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        label { display: flex; justify-content: space-between; color: var(--cyan); font-weight: bold; }
+        
+        input[type=range] { accent-color: var(--orange); cursor: pointer; }
+
+        .launch-btn {
+            grid-column: span 2;
+            background: var(--orange);
+            color: #000;
+            border: none;
+            padding: 15px;
+            font-family: 'Orbitron';
+            font-weight: bold;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .launch-btn:hover { background: var(--cyan); box-shadow: 0 0 20px var(--cyan); }
+
+        .stats-panel {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .telemetry {
+            background: #000;
+            padding: 15px;
+            border-left: 4px solid var(--orange);
+        }
+
+        .chart-box { background: white; border-radius: 8px; padding: 10px; height: 200px; }
+
+        .quiz-box {
+            background: rgba(0, 242, 255, 0.05);
+            padding: 25px;
+            border: 1px dashed var(--cyan);
+        }
+
+        .question { margin-bottom: 20px; }
+        .question p { margin-bottom: 10px; text-align: justify; }
+
+        .opt {
+            background: #1c222d;
+            padding: 12px;
+            margin: 5px 0;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .opt:hover { border-color: var(--cyan); }
+        .opt.selected { background: var(--cyan); color: #000; font-weight: bold; }
+
+        #result-display {
+            text-align: center;
+            padding: 15px;
+            margin-top: 20px;
+            display: none;
+            font-weight: bold;
+            border: 1px solid;
+        }
+    </style>
+</head>
+<body>
+
+<div class="mission-container">
+    <header><h1>IONRUGÓS HIPERTÉR-TESZT</h1></header>
+
+    <div class="simulation-viewport">
+        <canvas id="simCanvas"></canvas>
+    </div>
+
+    <div class="control-grid">
+        <div class="slider-box">
+            <label>Rugóerő (F): <span id="f-val">50</span> N</label>
+            <input type="range" id="f-slider" min="20" max="250" value="50">
+        </div>
+        <div class="slider-box">
+            <label>Űrhajó Tömeg (m): <span id="m-val">2.0</span> kg</label>
+            <input type="range" id="m-slider" min="0.5" max="8.0" step="0.5" value="2.0">
+        </div>
+        <button class="launch-btn" onclick="launchMission()">LÖKET INDÍTÁSA</button>
+    </div>
+
+    <div class="stats-panel">
+        <div class="telemetry">
+            <h4 style="margin:0; color:var(--orange)">TELEMETRIA</h4>
+            <p>> Gyorsulás: <span id="out-a">25.0</span> m/s²</p>
+            <p>> Távolság: <span id="out-d">0</span> m</p>
+        </div>
+        <div class="chart-box">
+            <canvas id="missionChart"></canvas>
+        </div>
+    </div>
+
+    <div class="quiz-box">
+        <h3 style="color:var(--orange); font-family:'Orbitron'">🛰️ KÜLDETÉS-KIÉRTÉKELŐ</h3>
+        <div id="quiz-content"></div>
+        <button class="launch-btn" style="width:100%; margin-top:20px" onclick="checkQuiz()">KIÉRTÉKELÉS ÉS PONTKÜLDÉS</button>
+        <div id="result-display"></div>
+    </div>
+</div>
+
+<script>
+    const canvas = document.getElementById('simCanvas');
+    const ctx = canvas.getContext('2d');
+    let shipX = 80;
+    let isFlying = false;
+    let currentDist = 0;
+
+    // --- GOOGLE APPS SCRIPT LINK ---
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxbpZ-9dnlSlpVWGAqFmQCpNLELkg1YcVRboxv-Fsch3FlzGkV7mb6kP4cz8NJ4EmQClA/exec"; 
+
+    const fS = document.getElementById('f-slider');
+    const mS = document.getElementById('m-slider');
+
+    function setupCanvas() {
+        canvas.width = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
+        drawScene();
+    }
+
+    function updateUI() {
+        document.getElementById('f-val').innerText = fS.value;
+        document.getElementById('m-val').innerText = mS.value;
+        document.getElementById('out-a').innerText = (fS.value / mS.value).toFixed(1);
+        if(!isFlying) {
+            shipX = 40 + (fS.value / 3);
+            drawScene();
+        }
+    }
+
+    [fS, mS].forEach(s => s.addEventListener('input', updateUI));
+
+    function drawScene() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const groundY = canvas.height - 40;
+        ctx.fillStyle = "white";
+        for(let i=0; i<20; i++) ctx.fillRect((i*57)%canvas.width, (i*23)%canvas.height, 1, 1);
+
+        const springEndX = isFlying ? 60 : shipX;
+        ctx.strokeStyle = "#ff8c00";
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(10, groundY - 20);
+        for(let i=0; i<=12; i++) {
+            ctx.lineTo(10 + i*((springEndX-10)/12), groundY - 20 + (i%2==0 ? 10 : -10));
+        }
+        ctx.stroke();
+
+        ctx.save();
+        ctx.translate(shipX, groundY - 20);
+        ctx.fillStyle = "#00f2ff";
+        ctx.beginPath();
+        ctx.moveTo(0, -15); ctx.lineTo(50, 0); ctx.lineTo(0, 15); ctx.fill();
+        if(isFlying && shipX < canvas.width - 100) {
+            ctx.fillStyle = "orange";
+            ctx.beginPath(); ctx.moveTo(-10, -5); ctx.lineTo(-25, 0); ctx.lineTo(-10, 5); ctx.fill();
+        }
+        ctx.restore();
+    }
+
+    function launchMission() {
+        if(isFlying) return;
+        isFlying = true;
+        let v = (fS.value / mS.value) * 0.4;
+        currentDist = (fS.value / mS.value) * 15;
+        function animate() {
+            shipX += v; v *= 0.985;
+            drawScene();
+            if(v > 0.1 && shipX < canvas.width) requestAnimationFrame(animate);
+            else { 
+                isFlying = false; 
+                document.getElementById('out-d').innerText = Math.round(currentDist);
+                addToChart(Math.round(currentDist));
+            }
+        }
+        animate();
+    }
+
+    const chartCtx = document.getElementById('missionChart').getContext('2d');
+    let history = [];
+    const chart = new Chart(chartCtx, {
+        type: 'line',
+        data: { labels: [], datasets: [{ label: 'Távolság (m)', data: history, borderColor: '#ff8c00', fill: false }] },
+        options: { maintainAspectRatio: false }
+    });
+
+    function addToChart(val) {
+        history.push(val);
+        chart.data.labels.push(history.length + ".");
+        chart.update();
+    }
+
+    const quizData = [
+        { q: "Milyen hatással van az erő az űrhajóra?", a: ["Alakváltoztató hatása", "Mozgásállapotváltoztató hatása", "Nincs rá hatással"], c: 1 },
+        { q: "Hogyan változik az űrhajó mozgásállapota, ha növeljük a rugó erejét?", a: ["Kisebb lesz a sebességváltozás", "Nagyobb lesz a sebességváltozás", "Nem változik"], c: 1 },
+        { q: "Mi a kapcsolat a tömeg és a mozgásállapot-változás (gyorsulás) között?", a: ["Egyenes arányosság", "Fordított arányosság", "Nincs kapcsolat"], c: 1 },
+        { q: "Ha ugyanazzal az erővel lökünk el egy nehezebb űrhajót, az...", a: ["Messzebbre jut", "Közelebb áll meg", "Ugyanoda jut"], c: 1 }
+    ];
+
+    function renderQuiz() {
+        const cont = document.getElementById('quiz-content');
+        quizData.forEach((item, idx) => {
+            let html = `<div class="question"><p><strong>${idx+1}. ${item.q}</strong></p>`;
+            item.a.forEach((opt, oIdx) => {
+                html += `<div class="opt" onclick="selectOpt(this, ${idx}, ${oIdx})">${opt}</div>`;
+            });
+            html += `</div>`;
+            cont.innerHTML += html;
+        });
+    }
+
+    let userAnswers = {};
+    function selectOpt(el, qIdx, oIdx) {
+        Array.from(el.parentElement.querySelectorAll('.opt')).forEach(c => c.classList.remove('selected'));
+        el.classList.add('selected');
+        userAnswers[qIdx] = oIdx;
+    }
+
+    function checkQuiz() {
+        let score = 0;
+        quizData.forEach((d, i) => { if(userAnswers[i] === d.c) score++; });
+        const res = document.getElementById('result-display');
+        res.style.display = "block";
+        res.innerHTML = `DIAGNÓZIS: ${score} / ${quizData.length} adat helyes.`;
+        
+        if(score === quizData.length) {
+            res.style.borderColor = "#00f2ff";
+            res.style.color = "#00f2ff";
+            sendPoints(10, "sm1"); 
+        } else {
+            res.style.borderColor = "#ff8c00";
+            res.style.color = "#ff8c00";
+        }
+    }
+
+    function sendPoints(points, missionId) {
+        const userData = JSON.parse(localStorage.getItem('currentUser'));
+        if(!userData || !SCRIPT_URL) {
+            console.error("Hiba: Nincs bejelentkezett felhasználó vagy SCRIPT_URL!");
+            return;
+        }
+
+        const finalUrl = `${SCRIPT_URL}?name=${encodeURIComponent(userData.name)}&points=${points}&mission=${missionId}`;
+
+        fetch(finalUrl, {
+            method: 'GET',
+            mode: 'no-cors'
+        })
+        .then(() => alert("KÜLDETÉS TELJESÍTVE! Adatok szinkronizálva az L1_HW táblázattal."))
+        .catch(err => console.error("Hiba:", err));
+    }
+
+    window.onload = () => { setupCanvas(); renderQuiz(); updateUI(); };
+</script>
+
+</body>
+</html>
