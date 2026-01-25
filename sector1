@@ -121,7 +121,7 @@
         
         <div class="prologue-image">
             <div style="color: var(--orange); font-size: 0.8rem; text-align: center; padding: 10px;">
-                [KÉP HELYE]<br>
+                <img src="images/sector1.jpg"><br>
                 (Töltsd fel a képet a GitHub-ra és add meg az elérési utat az img src-nél)
             </div>
         </div>
