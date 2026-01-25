@@ -116,6 +116,44 @@
             <img src="images/sector1.png" alt="Newton-1 roncsok">
         </div>
     </div>
+            <div id="action-zone" style="display:none; text-align: center; margin-top: 50px;">
+    <a href="sector1_task.html" class="launch-btn">DIAGNOSZTIKA INDÍTÁSA</a>
+</div>
+
+<style>
+    .launch-btn {
+        display: inline-block;
+        padding: 15px 40px;
+        border: 2px solid var(--orange);
+        color: var(--orange);
+        text-decoration: none;
+        font-family: 'Orbitron';
+        font-weight: bold;
+        letter-spacing: 3px;
+        transition: 0.3s;
+        background: rgba(255, 140, 0, 0.1);
+        box-shadow: 0 0 15px rgba(255, 140, 0, 0.2);
+    }
+    .launch-btn:hover {
+        background: var(--orange);
+        color: var(--bg);
+        box-shadow: 0 0 30px var(--orange);
+    }
+</style>
+
+<script>
+    // Módosítsuk a typeWriter végét, hogy a gomb megjelenjen:
+    function typeWriter() {
+        if (i < text.length) {
+            target.innerHTML += text.substring(i, i + charsPerStep);
+            i += charsPerStep;
+            setTimeout(typeWriter, speed);
+        } else {
+            // Megjelenítjük a gombot, ha a szöveg végére értünk
+            document.getElementById("action-zone").style.display = "block";
+        }
+    }
+</script>
 
     <script>
        // A feltöltött szöveged
