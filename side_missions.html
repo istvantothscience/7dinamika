@@ -56,6 +56,7 @@
             transform: translateY(-5px);
         }
 
+        /* Zárolt kártya stílusa */
         .card.locked {
             border-color: #333;
             background: var(--locked);
@@ -75,6 +76,14 @@
             font-size: 1.2rem;
             margin-bottom: 10px;
             color: var(--orange);
+        }
+
+        .status-badge {
+            font-size: 0.7rem;
+            padding: 3px 8px;
+            border: 1px solid;
+            display: inline-block;
+            margin-bottom: 15px;
         }
 
         .btn {
@@ -100,6 +109,13 @@
             color: #333;
             cursor: not-allowed;
         }
+
+        .lock-icon {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 1.5rem;
+        }
     </style>
 </head>
 <body>
@@ -113,55 +129,43 @@
     <div class="grid" id="side-grid">
         </div>
 
-<script>
-    // MELLÉKKÜLDETÉSEK ADATAI
-    const sideMissions = [
-        {
-            id: "sm1",
-            title: "S.M. 01",
-            name: "Ionrugós hipertérugrás",
-            desc: "Teszteld az ionrugók erejét és a tömeg kapcsolatát a gyorsulással.",
-            file: "sm1_test.html",
-            locked: false
-        },
-        {
-            id: "sm2",
-            title: "S.M. 02",
-            name: "Gravitációs hinta",
-            desc: "Zárolt tartalom. Fejlesztés alatt...",
-            file: "#",
-            locked: true
-        },
-        {
-            id: "sm3",
-            title: "S.M. 03",
-            name: "Foton-ágyú kalibráció",
-            desc: "Zárolt tartalom. Fejlesztés alatt...",
-            file: "#",
-            locked: true
-        }
-    ];
+    <script>
+        // Adatok lekérése (pontszám ellenőrzéséhez)
+        const userData = JSON.parse(localStorage.getItem('currentUser')) || { points: 0 };
+        const userPoints = parseInt(userData.points) || 0;
 
-    function renderMissions() {
+        // A 6 mellékküldetés definíciója
+        const sideMissions = [
+            { id: 1, name: "S.M. 01", title: "ERŐMÉRŐ TESZT", limit: 0, desc: "Alapszintű diagnosztika az erő fogalmáról.", link: "sm1_test.html" },
+            { id: 2, name: "S.M. 02", title: "GRAVITÁCIÓS SZIMULÁCIÓ", limit: 10, desc: "A Kepler-452b vonzerejének mérése.", link: "sm2_sim.html" },
+            { id: 3, name: "S.M. 03", title: "AI ADATBÁNYÁSZAT", desc: "Beszélj a robottal és tudd meg a titkos kódot!", limit: 20, link: "sm3_chat.html" },
+            { id: 4, name: "S.M. 04", title: "TEHETETLENSÉGI MODUL", limit: 30, desc: "Newton I. törvényének gyakorlati alkalmazása.", link: "sm4_inertia.html" },
+            { id: 5, name: "S.M. 05", title: "SÚRLÓDÁSI EGYÜTTHATÓ", limit: 40, desc: "A talajminták csúszási ellenállásának mérése.", link: "sm5_friction.html" },
+            { id: 6, name: "S.M. 06", title: "ZÁRÓ VÉGELENŐRZÉS", limit: 50, desc: "Komplex fizikai szimuláció a hazatéréshez.", link: "sm6_final.html" }
+        ];
+
         const grid = document.getElementById('side-grid');
-        grid.innerHTML = sideMissions.map(m => `
-            <div class="card ${m.locked ? 'locked' : ''}">
-                <div>
-                    <div class="mission-title">${m.title}</div>
-                    <h3>${m.name}</h3>
-                    <p>${m.desc}</p>
+
+        sideMissions.forEach(mission => {
+            const isLocked = userPoints < mission.limit;
+            
+            const cardHTML = `
+                <div class="card ${isLocked ? 'locked' : ''}">
+                    <div class="status-badge">${isLocked ? 'ZÁROLT' : 'ELÉRHETŐ'}</div>
+                    <h3>${mission.name}</h3>
+                    <div class="mission-title">${mission.title}</div>
+                    <p style="font-size: 0.8rem; opacity: 0.8;">${mission.desc}</p>
+                    <div style="font-size: 0.7rem; margin-top: 10px;">
+                        KÖVETELMÉNY: ${mission.limit} PT 
+                        ${isLocked ? `(Még ${mission.limit - userPoints} PT szükséges)` : ''}
+                    </div>
+                    <a href="${isLocked ? '#' : mission.link}" class="btn">
+                        ${isLocked ? 'ZÁROLT ADATOK' : 'KÜLDETÉS INDÍTÁSA'}
+                    </a>
                 </div>
-                ${m.locked ? 
-                    `<div class="btn">ZÁROLT</div>` : 
-                    `<a href="${m.file}" class="btn">INDÍTÁS</a>`
-                }
-            </div>
-        `).join('');
-    }
-
-    // Oldal betöltésekor kártyák kirajzolása
-    window.onload = renderMissions;
-</script>
-
+            `;
+            grid.innerHTML += cardHTML;
+        });
+    </script>
 </body>
 </html>
