@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kepler-452b - Küldetések</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-cyan: #00f2ff;
+            --emergency-orange: #ff8c00;
+            --deep-space: #0a0b10;
+            --locked-bg: #1a1a1a;
+            --locked-text: #444;
+        }
+
+        body {
+            background-color: var(--deep-space);
+            background-image: radial-gradient(circle at 50% 50%, rgba(0, 242, 255, 0.05) 0%, transparent 80%);
+            color: var(--neon-cyan);
+            font-family: 'Share Tech Mono', monospace;
+            margin: 0; padding: 20px;
+        }
+
+        header {
+            padding: 20px;
+            border-bottom: 1px solid var(--neon-cyan);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            max-width: 1200px;
+            margin: 40px auto;
+        }
+
+        /* ALAP KÁRTYA STÍLUS */
+        .card {
+            padding: 30px;
+            text-align: center;
+            transition: all 0.4s ease;
+            position: relative;
+            border-radius: 5px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* AKTÍV KÜLDETÉS: Világoskék neon */
+        .card.active {
+            background: rgba(0, 242, 255, 0.1);
+            border: 2px solid var(--neon-cyan);
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.3);
+            color: var(--neon-cyan);
+        }
+        
+        .card.active:hover {
+            box-shadow: 0 0 25px rgba(0, 242, 255, 0.5);
+            transform: translateY(-5px);
+        }
+
+        /* PASSZÍV/LAKOLT KÜLDETÉS: Sötét és komor */
+        .card.locked {
+            background: var(--locked-bg);
+            border: 2px solid #222;
+            color: var(--locked-text);
+            filter: grayscale(1);
+            cursor: not-allowed;
+        }
+
+        .card h3 { font-family: 'Orbitron', sans-serif; margin-bottom: 10px; }
+        
+        .btn {
+            margin-top: 20px;
+            padding: 12px;
+            text-decoration: none;
+            font-weight: bold;
+            font-family: 'Orbitron', sans-serif;
+            border: 1px solid;
+            transition: 0.3s;
+        }
+
+        .active .btn {
+            border-color: var(--neon-cyan);
+            color: var(--neon-cyan);
+        }
+
+        .active .btn:hover {
+            background: var(--neon-cyan);
+            color: var(--deep-space);
+        }
+
+        .locked .btn {
+            border-color: var(--locked-text);
+            color: var(--locked-text);
+            pointer-events: none;
+        }
+
+        .status-tag {
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div style="font-family: 'Orbitron';">SZEKTOROK | ENERGIA SZINT: <span id="my-points" style="color:var(--emergency-orange)">0</span> PT</div>
+        <a href="missions.html" style="color:var(--emergency-orange); text-decoration:none; border:1px solid var(--emergency-orange); padding:5px 15px;">VISSZA</a>
+    </header>
+
+    <div class="grid" id="mission-grid"></div>
+
+    <script>
+        const userData = JSON.parse(localStorage.getItem('currentUser'));
+        const userPoints = parseInt(userData ? userData.points : 0);
+        document.getElementById('my-points').innerText = userPoints;
+
+        // Küldetések (Szekciók a 7.dinamika.pdf alapján)
+        const missions = [
+            { id: 1, name: "SECTOR 1", limit: 0, title: "AZ ERŐ", desc: "A hajótest sérüléseinek felmérése és az erők azonosítása." },
+            { id: 2, name: "SECTOR 2", limit: 10, title: "TEHETETLENSÉG", desc: "Newton I. törvénye: miért nem állnak meg a tárgyak?" },
+            { id: 3, name: "SECTOR 3", limit: 20, title: "DINAMIKA", desc: "Newton II. törvénye: a hajtóművek újraindítása." },
+            { id: 4, name: "SECTOR 4", limit: 30, title: "GRAVITÁCIÓ", desc: "A Kepler-452b vonzereje és a súly mérése." },
+            { id: 5, name: "SECTOR 5", limit: 40, title: "SÚRLÓDÁS", desc: "A rakomány mozgatása a bolygó felszínén." },
+            { id: 6, name: "SECTOR 6", limit: 50, title: "ATMOSZFÉRA", desc: "Légellenállás: a visszatérő egység formatervezése." }
+        ];
+
+        const grid = document.getElementById('mission-grid');
+
+        missions.forEach(m => {
+            const isLocked = userPoints < m.limit;
+            const card = document.createElement('div');
+            card.className = `card ${isLocked ? 'locked' : 'active'}`;
+            
+            card.innerHTML = `
+                <div class="status-tag">${isLocked ? 'OFFLINE' : 'ONLINE'}</div>
+                <h3>${m.name}</h3>
+                <h4 style="font-size: 0.8rem; margin-top:-10px; color: ${isLocked ? '#444' : 'var(--emergency-orange)'}">${m.title}</h4>
+                <p style="font-size: 0.85rem;">${m.desc}</p>
+                <div style="font-size: 0.7rem; margin-bottom: 10px;">Szükséges pont: ${m.limit}</div>
+                <a href="${isLocked ? '#' : 'sector' + m.id + '.html'}" class="btn">
+                    ${isLocked ? 'HOZZÁFÉRÉS MEGTILTVA' : 'KÜLDETÉS INDÍTÁSA'}
+                </a>
+            `;
+            grid.appendChild(card);
+        });
+    </script>
+</body>
+</html>
