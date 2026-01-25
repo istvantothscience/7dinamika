@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kepler-452b - Főparancsnokság</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-cyan: #00f2ff;
+            --emergency-orange: #ff8c00;
+            --deep-space: #0a0b10;
+            --glass: rgba(0, 242, 255, 0.05);
+        }
+
+        body {
+            background-color: var(--deep-space);
+            background-image: radial-gradient(circle at 50% 50%, rgba(0, 242, 255, 0.1) 0%, transparent 80%);
+            color: var(--neon-cyan);
+            font-family: 'Share Tech Mono', monospace;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Felső státusz sáv */
+        header {
+            padding: 20px;
+            border-bottom: 1px solid var(--neon-cyan);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        .status-display {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            color: var(--emergency-orange);
+        }
+
+        /* Főmenü konténer */
+        .main-menu {
+            flex-grow: 1;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            padding: 50px;
+            max-width: 1000px;
+            margin: 0 auto;
+            align-content: center;
+        }
+
+        .menu-item {
+            background: var(--glass);
+            border: 2px solid var(--neon-cyan);
+            padding: 40px;
+            text-align: center;
+            text-decoration: none;
+            color: var(--neon-cyan);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 0 15px rgba(0, 242, 255, 0.1);
+        }
+
+        .menu-item:hover {
+            background: rgba(0, 242, 255, 0.15);
+            border-color: var(--emergency-orange);
+            color: var(--emergency-orange);
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(255, 140, 0, 0.2);
+        }
+
+        .menu-item i {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .menu-item .desc {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.8rem;
+            margin-top: 10px;
+            opacity: 0.8;
+            text-transform: uppercase;
+        }
+
+        .logout-btn {
+            color: var(--emergency-orange);
+            text-decoration: none;
+            border: 1px solid var(--emergency-orange);
+            padding: 5px 15px;
+            font-size: 0.8rem;
+        }
+
+        .logout-btn:hover {
+            background: var(--emergency-orange);
+            color: var(--deep-space);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="status-display">
+            SZEKTOR: KEPLER-452B | EGYSÉG: NEWTON-1 | KADÉT: <span id="user-name">...</span>
+        </div>
+        <a href="index.html" class="logout-btn" onclick="localStorage.clear()">KIJELENTKEZÉS</a>
+    </header>
+
+    <div class="main-menu">
+        <a href="sectors.html" class="menu-item">
+            <span>KÜLDETÉS</span>
+            <div class="desc">A fizikai törvények helyreállítása</div>
+        </a>
+
+        <a href="#" class="menu-item">
+            <span>MELLÉKKÜLDETÉS</span>
+            <div class="desc">Bónusz feladatok és extra pontok</div>
+        </a>
+
+        <a href="#" class="menu-item">
+            <span>KARAKTER</span>
+            <div class="desc">Rang, felszerelés és statisztika</div>
+        </a>
+
+        <a href="#" class="menu-item">
+            <span>FEDÉLZETI SZÁMÍTÓGÉP</span>
+            <div class="desc">AI Asszisztens és adatbank</div>
+        </a>
+    </div>
+
+    <script>
+        // Felhasználó betöltése
+        const userData = JSON.parse(localStorage.getItem('currentUser'));
+        if (!userData) {
+            window.location.href = "index.html";
+        } else {
+            document.getElementById('user-name').innerText = userData.name.toUpperCase();
+        }
+    </script>
+
+</body>
+</html>
