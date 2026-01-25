@@ -151,8 +151,8 @@
 <script>
     // ELLENŐRIZD EZT A KULCSOT: Ha nem működik, generálj egy újat az AI Studioban!
     const API_KEY = "AIzaSyBVVGUb0squnQlorx4hnObWdkfG3FAnLU8"; 
-    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
-
+    const API_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+    
    const SYSTEM_PROMPT = `Te vagy Mély Gondolat Jr., a Kepler-452b misszió fedélzeti főszámítógépe. 
 
 SZEMÉLYISÉG (Galaktikus Útikalauz stílus):
@@ -181,34 +181,27 @@ async function sendMessage() {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                contents: [{ parts: [{ text: SYSTEM_PROMPT + "\n\nKérdés: " + text }] }],
-                // KIKAPCSOLJUK A SZIGORÚ SZŰRŐKET, HOGY MEGYEN A HUMOR
-                safetySettings: [
-                    { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
-                    { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
-                    { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
-                    { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" }
-                ]
+                contents: [{ parts: [{ text: SYSTEM_PROMPT + "\n\nKérdés: " + text }] }]
             })
         });
 
         const data = await response.json();
         
-        // Ha valami hiba jön vissza a Google-től
+        // Ha hiba van a válaszban
         if (data.error) {
             displayMessage("GALAKTIKUS HIBA: " + data.error.message, 'ai-msg');
-            console.error(data.error);
+            console.log(data.error);
             return;
         }
 
-        // Ha a válasz "üres" (pl. letiltotta a szűrő)
-        if (!data.candidates || !data.candidates[0].content) {
-            displayMessage("RENDSZERHIBA: A válasz blokkolva lett vagy üres.", 'ai-msg');
-            return;
+        // A válasz kinyerése a stabil API struktúrából
+        if (data.candidates && data.candidates[0].content) {
+            const aiText = data.candidates[0].content.parts[0].text;
+            displayMessage(aiText, 'ai-msg');
+        } else {
+            displayMessage("A gép hallgat... (Üres válasz érkezett)", 'ai-msg');
         }
 
-        const aiText = data.candidates[0].content.parts[0].text;
-        displayMessage(aiText, 'ai-msg');
     } catch (e) {
         displayMessage("Hiba történt: " + e.message, 'ai-msg');
     }
