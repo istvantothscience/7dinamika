@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fedélzeti Számítógép - Mély Gondolat Jr.</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root { --cyan: #00f2ff; --bg: #0a0b10; --orange: #ff8c00; }
+        body {
+            background-color: var(--bg);
+            color: var(--cyan);
+            font-family: 'Share Tech Mono', monospace;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+        header {
+            padding: 20px;
+            border-bottom: 1px solid var(--cyan);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 242, 255, 0.05);
+        }
+        #chat-window {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .message {
+            max-width: 80%;
+            padding: 10px 15px;
+            border-radius: 5px;
+            line-height: 1.4;
+        }
+        .ai-msg {
+            align-self: flex-start;
+            border-left: 3px solid var(--orange);
+            background: rgba(255, 140, 0, 0.05);
+        }
+        .user-msg {
+            align-self: flex-end;
+            border-right: 3px solid var(--cyan);
+            background: rgba(0, 242, 255, 0.05);
+            color: white;
+        }
+        .input-area {
+            padding: 20px;
+            border-top: 1px solid var(--cyan);
+            display: flex;
+            gap: 10px;
+        }
+        input {
+            flex: 1;
+            background: transparent;
+            border: 1px solid var(--cyan);
+            color: white;
+            padding: 12px;
+            font-family: 'Share Tech Mono';
+        }
+        button {
+            background: var(--cyan);
+            color: black;
+            border: none;
+            padding: 0 20px;
+            font-family: 'Orbitron';
+            cursor: pointer;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div style="font-family: 'Orbitron'; letter-spacing: 2px;">MÉLY GONDOLAT JR. v1.0</div>
+    <a href="missions.html" style="color: var(--orange); text-decoration: none;">[ KILÉPÉS ]</a>
+</header>
+
+<div id="chat-window">
+    <div class="message ai-msg">
+        Üdvözlöm, Kadét. Éppen az univerzum értelmetlenségén merengtem, de ha már itt van, tehet valami hasznosat. Kérdezzen a dinamikáról, vagy mutassa a házi feladatát, hátha találok benne valami szórakoztató hibát.
+    </div>
+</div>
+
+<div class="input-area">
+    <input type="text" id="user-input" placeholder="Írja be az üzenetet..." onkeypress="if(event.key === 'Enter') sendMessage()">
+    <button onclick="sendMessage()">KÜLDÉS</button>
+</div>
+
+<script>
+    const API_KEY = "IDE_MÁSOLD_AZ_API_KULCSODAT";
+    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+
+    const SYSTEM_PROMPT = `Te vagy Mély Gondolat Jr., egy Douglas Adams stílusú fedélzeti számítógép. 
+    Stílusod: szarkasztikus, cinikus, de tudományosan precíz. Newton törvényeit tökéletesen ismered.
+    Házi feladat infó: A 2. feladatban az űrhajó 5000 kg, az erő 15000 N, a gyorsulás tehát 3 m/s2. 
+    Ha a felhasználó elakad, segíts neki rávezetni a megoldásra, ne csak a végeredményt mondd meg azonnal, 
+    de ha megadja a jó eredményt, ismerd el (a magad fanyar stílusában).`;
+
+    async function sendMessage() {
+        const input = document.getElementById('user-input');
+        const text = input.value.trim();
+        if (!text) return;
+
+        displayMessage(text, 'user-msg');
+        input.value = '';
+
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: SYSTEM_PROMPT + "\n\nKérdés: " + text }] }]
+                })
+            });
+
+            const data = await response.json();
+            const aiText = data.candidates[0].content.parts[0].text;
+            displayMessage(aiText, 'ai-msg');
+        } catch (e) {
+            displayMessage("Valami hiba történt a galaktikus hálózatban. Valószínűleg egy vogon verseskötet miatt.", 'ai-msg');
+        }
+    }
+
+    function displayMessage(text, className) {
+        const win = document.getElementById('chat-window');
+        const div = document.createElement('div');
+        div.className = `message ${className}`;
+        div.innerText = text;
+        win.appendChild(div);
+        win.scrollTop = win.scrollHeight;
+    }
+</script>
+
+</body>
+</html>
