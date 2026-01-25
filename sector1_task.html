@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sektor 1 - Diagnosztikai Feladat</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --cyan: #00f2ff;
+            --orange: #ff8c00;
+            --bg: #0a0b10;
+        }
+
+        body {
+            background-color: var(--bg);
+            background-image: radial-gradient(circle at 50% 50%, rgba(0, 242, 255, 0.05) 0%, transparent 80%);
+            color: var(--cyan);
+            font-family: 'Share Tech Mono', monospace;
+            margin: 0;
+            padding: 40px;
+            min-height: 100vh;
+        }
+
+        .task-container {
+            max-width: 900px;
+            margin: 0 auto;
+            border: 1px solid var(--cyan);
+            background: rgba(10, 11, 16, 0.9);
+            padding: 40px;
+            box-shadow: 0 0 30px rgba(0, 242, 255, 0.15);
+            position: relative;
+        }
+
+        .content-layout {
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+            margin-bottom: 30px;
+        }
+
+        .text-side {
+            flex: 2;
+        }
+
+        .image-side {
+            flex: 0 0 250px;
+            border: 1px solid var(--orange);
+            background: #000;
+        }
+
+        .image-side img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        h2 {
+            font-family: 'Orbitron';
+            color: var(--orange);
+            letter-spacing: 3px;
+            margin-top: 0;
+        }
+
+        /* Írógép stílus sárga kurzorral */
+        #typed-task-text {
+            text-align: justify;
+            line-height: 1.8;
+            font-size: 1.1rem;
+            color: #e0faff;
+        }
+
+        #typed-task-text::after {
+            content: "";
+            display: inline-block;
+            width: 10px;
+            height: 1.2rem;
+            background-color: var(--orange);
+            margin-left: 5px;
+            vertical-align: middle;
+            animation: blink 0.8s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        .instruction-box {
+            background: rgba(255, 140, 0, 0.05);
+            padding: 20px;
+            border: 1px dashed var(--orange);
+            margin-top: 20px;
+            display: none; /* Csak a gépelés után jelenik meg */
+        }
+
+        .classroom-btn {
+            display: block;
+            max-width: 400px;
+            margin: 30px auto 0;
+            padding: 20px;
+            border: 2px solid var(--cyan);
+            color: var(--cyan);
+            text-decoration: none;
+            font-family: 'Orbitron';
+            text-align: center;
+            transition: 0.3s;
+            display: none; /* Csak a gépelés után jelenik meg */
+        }
+
+        .classroom-btn:hover {
+            background: var(--cyan);
+            color: var(--bg);
+            box-shadow: 0 0 25px var(--cyan);
+        }
+
+        .back-link {
+            display: block;
+            margin-top: 30px;
+            color: var(--orange);
+            text-decoration: none;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="task-container">
+        <h2>ADATGYŰJTÉSI FÁZIS</h2>
+        
+        <div class="content-layout">
+            <div class="text-side">
+                <div id="typed-task-text"></div>
+            </div>
+            <div class="image-side">
+                <img src="images/robot_diag.png" alt="Diagnosztikai Robot">
+            </div>
+        </div>
+
+        <div id="instruction" class="instruction-box">
+            <strong>UTASÍTÁS:</strong> A
