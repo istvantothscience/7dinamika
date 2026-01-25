@@ -56,7 +56,6 @@
             transform: translateY(-5px);
         }
 
-        /* Zárolt kártya stílusa */
         .card.locked {
             border-color: #333;
             background: var(--locked);
@@ -76,14 +75,6 @@
             font-size: 1.2rem;
             margin-bottom: 10px;
             color: var(--orange);
-        }
-
-        .status-badge {
-            font-size: 0.7rem;
-            padding: 3px 8px;
-            border: 1px solid;
-            display: inline-block;
-            margin-bottom: 15px;
         }
 
         .btn {
@@ -109,13 +100,6 @@
             color: #333;
             cursor: not-allowed;
         }
-
-        .lock-icon {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            font-size: 1.5rem;
-        }
     </style>
 </head>
 <body>
@@ -129,60 +113,55 @@
     <div class="grid" id="side-grid">
         </div>
 
-   <script>
-    // --- KONFIGURÁCIÓ ---
-    // A te saját Google Apps Script linked
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxVEmP0Vi-O_PM9I5UIrcJVzKxRkOcBGD8efufcpiiKm269PSSYRaeZTlnTUs2Edt3jiQ/exec"; 
-
-    // ... (itt marad a többi változatlan kód: canvas, chart, quizData stb.) ...
-    // Görgess le a checkQuiz és sendPoints függvényekhez:
-
-    function checkQuiz() {
-        let score = 0;
-        quizData.forEach((d, i) => { if(userAnswers[i] === d.c) score++; });
-        const res = document.getElementById('result-display');
-        res.style.display = "block";
-        res.innerHTML = `DIAGNÓZIS: ${score} / ${quizData.length} adat helyes.`;
-        
-        if(score === quizData.length) {
-            res.style.borderColor = "#00f2ff";
-            res.style.color = "#00f2ff";
-            
-            // FONTOS: Itt küldjük az sm1 azonosítót!
-            sendPoints(10, "sm1"); 
-        } else {
-            res.style.borderColor = "#ff8c00";
-            res.style.color = "#ff8c00";
+<script>
+    // MELLÉKKÜLDETÉSEK ADATAI
+    const sideMissions = [
+        {
+            id: "sm1",
+            title: "S.M. 01",
+            name: "Ionrugós hipertérugrás",
+            desc: "Teszteld az ionrugók erejét és a tömeg kapcsolatát a gyorsulással.",
+            file: "sm1_test.html",
+            locked: false
+        },
+        {
+            id: "sm2",
+            title: "S.M. 02",
+            name: "Gravitációs hinta",
+            desc: "Zárolt tartalom. Fejlesztés alatt...",
+            file: "#",
+            locked: true
+        },
+        {
+            id: "sm3",
+            title: "S.M. 03",
+            name: "Foton-ágyú kalibráció",
+            desc: "Zárolt tartalom. Fejlesztés alatt...",
+            file: "#",
+            locked: true
         }
+    ];
+
+    function renderMissions() {
+        const grid = document.getElementById('side-grid');
+        grid.innerHTML = sideMissions.map(m => `
+            <div class="card ${m.locked ? 'locked' : ''}">
+                <div>
+                    <div class="mission-title">${m.title}</div>
+                    <h3>${m.name}</h3>
+                    <p>${m.desc}</p>
+                </div>
+                ${m.locked ? 
+                    `<div class="btn">ZÁROLT</div>` : 
+                    `<a href="${m.file}" class="btn">INDÍTÁS</a>`
+                }
+            </div>
+        `).join('');
     }
 
-    // EBBŐL A FÜGGVÉNYBŐL CSAK EZ AZ EGY MARADJON!
-    function sendPoints(points, missionId) {
-        const userData = JSON.parse(localStorage.getItem('currentUser'));
-        if(!userData || !SCRIPT_URL) {
-            console.error("Hiba: Nincs felhasználó vagy URL!");
-            return;
-        }
-
-        // Felépítjük a pontos URL-t a mission paraméterrel
-        const finalUrl = `${SCRIPT_URL}?name=${encodeURIComponent(userData.name)}&points=${points}&mission=${missionId}`;
-
-        console.log("Küldés folyamatban ide:", finalUrl);
-
-        fetch(finalUrl, {
-            method: 'GET',
-            mode: 'no-cors'
-        })
-        .then(() => {
-            alert("SIKERES ADATKÜLDÉS! A pontszámod rögzítve az I oszlopban.");
-        })
-        .catch(err => {
-            console.error("Hiba a hálózati kérésnél:", err);
-            alert("Hálózati hiba történt az adatküldés során.");
-        });
-    }
-
-    // A többi marad: window.onload = () => { setupCanvas(); renderQuiz(); updateUI(); };
+    // Oldal betöltésekor kártyák kirajzolása
+    window.onload = renderMissions;
 </script>
+
 </body>
 </html>
