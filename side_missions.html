@@ -129,43 +129,60 @@
     <div class="grid" id="side-grid">
         </div>
 
-    <script>
-        // Adatok lekérése (pontszám ellenőrzéséhez)
-        const userData = JSON.parse(localStorage.getItem('currentUser')) || { points: 0 };
-        const userPoints = parseInt(userData.points) || 0;
+   <script>
+    // --- KONFIGURÁCIÓ ---
+    // A te saját Google Apps Script linked
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxVEmP0Vi-O_PM9I5UIrcJVzKxRkOcBGD8efufcpiiKm269PSSYRaeZTlnTUs2Edt3jiQ/exec"; 
 
-        // A 6 mellékküldetés definíciója
-        const sideMissions = [
-            { id: 1, name: "S.M. 01", title: "ERŐMÉRŐ TESZT", limit: 0, desc: "Alapszintű diagnosztika az erő fogalmáról.", link: "sm1_test.html" },
-            { id: 2, name: "S.M. 02", title: "GRAVITÁCIÓS SZIMULÁCIÓ", limit: 10, desc: "A Kepler-452b vonzerejének mérése.", link: "sm2_sim.html" },
-            { id: 3, name: "S.M. 03", title: "AI ADATBÁNYÁSZAT", desc: "Beszélj a robottal és tudd meg a titkos kódot!", limit: 20, link: "sm3_chat.html" },
-            { id: 4, name: "S.M. 04", title: "TEHETETLENSÉGI MODUL", limit: 30, desc: "Newton I. törvényének gyakorlati alkalmazása.", link: "sm4_inertia.html" },
-            { id: 5, name: "S.M. 05", title: "SÚRLÓDÁSI EGYÜTTHATÓ", limit: 40, desc: "A talajminták csúszási ellenállásának mérése.", link: "sm5_friction.html" },
-            { id: 6, name: "S.M. 06", title: "ZÁRÓ VÉGELENŐRZÉS", limit: 50, desc: "Komplex fizikai szimuláció a hazatéréshez.", link: "sm6_final.html" }
-        ];
+    // ... (itt marad a többi változatlan kód: canvas, chart, quizData stb.) ...
+    // Görgess le a checkQuiz és sendPoints függvényekhez:
 
-        const grid = document.getElementById('side-grid');
-
-        sideMissions.forEach(mission => {
-            const isLocked = userPoints < mission.limit;
+    function checkQuiz() {
+        let score = 0;
+        quizData.forEach((d, i) => { if(userAnswers[i] === d.c) score++; });
+        const res = document.getElementById('result-display');
+        res.style.display = "block";
+        res.innerHTML = `DIAGNÓZIS: ${score} / ${quizData.length} adat helyes.`;
+        
+        if(score === quizData.length) {
+            res.style.borderColor = "#00f2ff";
+            res.style.color = "#00f2ff";
             
-            const cardHTML = `
-                <div class="card ${isLocked ? 'locked' : ''}">
-                    <div class="status-badge">${isLocked ? 'ZÁROLT' : 'ELÉRHETŐ'}</div>
-                    <h3>${mission.name}</h3>
-                    <div class="mission-title">${mission.title}</div>
-                    <p style="font-size: 0.8rem; opacity: 0.8;">${mission.desc}</p>
-                    <div style="font-size: 0.7rem; margin-top: 10px;">
-                        KÖVETELMÉNY: ${mission.limit} PT 
-                        ${isLocked ? `(Még ${mission.limit - userPoints} PT szükséges)` : ''}
-                    </div>
-                    <a href="${isLocked ? '#' : mission.link}" class="btn">
-                        ${isLocked ? 'ZÁROLT ADATOK' : 'KÜLDETÉS INDÍTÁSA'}
-                    </a>
-                </div>
-            `;
-            grid.innerHTML += cardHTML;
+            // FONTOS: Itt küldjük az sm1 azonosítót!
+            sendPoints(10, "sm1"); 
+        } else {
+            res.style.borderColor = "#ff8c00";
+            res.style.color = "#ff8c00";
+        }
+    }
+
+    // EBBŐL A FÜGGVÉNYBŐL CSAK EZ AZ EGY MARADJON!
+    function sendPoints(points, missionId) {
+        const userData = JSON.parse(localStorage.getItem('currentUser'));
+        if(!userData || !SCRIPT_URL) {
+            console.error("Hiba: Nincs felhasználó vagy URL!");
+            return;
+        }
+
+        // Felépítjük a pontos URL-t a mission paraméterrel
+        const finalUrl = `${SCRIPT_URL}?name=${encodeURIComponent(userData.name)}&points=${points}&mission=${missionId}`;
+
+        console.log("Küldés folyamatban ide:", finalUrl);
+
+        fetch(finalUrl, {
+            method: 'GET',
+            mode: 'no-cors'
+        })
+        .then(() => {
+            alert("SIKERES ADATKÜLDÉS! A pontszámod rögzítve az I oszlopban.");
+        })
+        .catch(err => {
+            console.error("Hiba a hálózati kérésnél:", err);
+            alert("Hálózati hiba történt az adatküldés során.");
         });
-    </script>
+    }
+
+    // A többi marad: window.onload = () => { setupCanvas(); renderQuiz(); updateUI(); };
+</script>
 </body>
 </html>
