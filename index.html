@@ -8,7 +8,7 @@
     <style>
         :root {
             --neon-cyan: #00f2ff;
-            --emergency-orange: #ff8c00;
+            --emergency-orange: #ff8c00; /* Neon narancs */
             --deep-space: #0a0b10;
         }
 
@@ -29,12 +29,13 @@
             width: 450px;
             padding: 40px;
             border: 2px solid var(--emergency-orange);
-            background: rgba(10, 11, 16, 0.85);
-            box-shadow: 0 0 30px rgba(255, 140, 0, 0.2);
+            background: rgba(10, 11, 16, 0.9);
+            box-shadow: 0 0 30px rgba(255, 140, 0, 0.3);
             text-align: center;
             position: relative;
         }
 
+        /* AZONOSÍTSA MAGÁT KADÉT - Narancssárga stílus */
         .main-title {
             font-family: 'Orbitron', sans-serif;
             color: var(--emergency-orange);
@@ -42,6 +43,7 @@
             letter-spacing: 2px;
             margin-bottom: 5px;
             text-transform: uppercase;
+            text-shadow: 0 0 10px rgba(255, 140, 0, 0.5);
         }
 
         .subtitle {
@@ -49,7 +51,6 @@
             color: var(--neon-cyan);
             margin-bottom: 30px;
             opacity: 0.7;
-            letter-spacing: 1px;
         }
 
         .input-group {
@@ -75,11 +76,6 @@
             outline: none;
         }
 
-        input:focus {
-            border-color: var(--emergency-orange);
-            box-shadow: 0 0 10px rgba(255, 140, 0, 0.3);
-        }
-
         button {
             width: 100%;
             padding: 15px;
@@ -96,7 +92,6 @@
         button:hover {
             background: var(--emergency-orange);
             color: var(--deep-space);
-            box-shadow: 0 0 20px var(--emergency-orange);
         }
 
         #status-msg {
@@ -124,12 +119,12 @@
         <p class="subtitle">Kepler-452b | Newton-1 túlélő adatbázis</p>
         
         <div class="input-group">
-            <label>SZEMÉLYI AZONOSÍTÓ:</label>
-            <input type="text" id="student-name" placeholder="Név beírása...">
+            <label>SZEMÉLYI AZONOSÍTÓ (NÉV):</label>
+            <input type="text" id="student-name" placeholder="Írja be a nevét...">
         </div>
 
         <div class="input-group">
-            <label>HOZZÁFÉRÉSI KÓD:</label>
+            <label>HOZZÁFÉRÉSI KÓD (JELSZÓ):</label>
             <input type="password" id="student-pass" placeholder="****">
         </div>
 
@@ -139,8 +134,8 @@
     </div>
 
     <script>
-        // Ide írd majd be a Google Sheet-ed CSV linkjét!
-        const CSV_URL = 'IDE_MASOLD_A_CSV_LINKET';
+        // Ide írd be a Google Sheets CSV linket!
+        const CSV_URL = 'IDE_MÁSOLD_BE_A_LINKET';
 
         async function login() {
             const name = document.getElementById('student-name').value;
@@ -148,21 +143,20 @@
             const status = document.getElementById('status-msg');
 
             if (!name || !pass) {
-                status.innerText = "HIBA: AZONOSÍTÓ ÉS KÓD SZÜKSÉGES!";
-                status.style.color = "#ff4444";
+                status.innerText = "HIBA: HIÁNYZÓ ADATOK!";
+                status.style.color = "red";
                 return;
             }
 
-            status.innerText = "ADATOK ELLENŐRZÉSE...";
+            status.innerText = "KAPCSOLÓDÁS AZ ADATBANKHOZ...";
             status.style.color = "var(--neon-cyan)";
             
             try {
                 const response = await fetch(CSV_URL);
                 const csvText = await response.text();
-                // Egyszerű CSV parzoló (sorok és oszlopok)
                 const rows = csvText.split('\n').map(row => row.split(','));
 
-                // Keresés: r[0] a név, r[1] a jelszó a Google Táblázatban
+                // Keresés a 0. (Név) és 1. (Jelszó) oszlopban
                 const user = rows.find(r => 
                     r[0] && r[0].trim().toLowerCase() === name.trim().toLowerCase() && 
                     r[1] && r[1].trim() === pass.trim()
@@ -172,23 +166,23 @@
                     status.innerText = "AZONOSÍTÁS SIKERES. ÜDVÖZÖLJÜK!";
                     status.style.color = "#00ff00";
                     
-                    // Adatok mentése a böngészőbe a következő oldalhoz
+                    // Adatok mentése
                     localStorage.setItem('currentUser', JSON.stringify({
                         name: user[0],
-                        points: user[26],
-                        type: user[27],
-                        level: user[28]
+                        level: user[28],
+                        points: user[26]
                     }));
                     
+                    // Átirányítás a Küldetésekhez
                     setTimeout(() => {
                         window.location.href = "missions.html";
                     }, 1500);
                 } else {
-                    status.innerText = "HOZZÁFÉRÉS MEGTAGADVA! ISMERETLEN KADÉT.";
-                    status.style.color = "#ff4444";
+                    status.innerText = "HIBA: ISMERETLEN KADÉT VAGY HIBÁS KÓD!";
+                    status.style.color = "red";
                 }
             } catch (e) {
-                status.innerText = "RENDSZERHIBA: KAPCSOLATI HIBA AZ ADATBÁZISSAL.";
+                status.innerText = "RENDSZERHIBA: NINCS KAPCSOLAT.";
                 console.error(e);
             }
         }
