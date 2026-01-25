@@ -3,190 +3,194 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mission Control - Newton-1</title>
+    <title>Kepler-452b Mission Control</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    
     <style>
         :root {
-            --neon-orange: #ff8c00;
             --neon-cyan: #00f2ff;
-            --deep-space: #050b1a;
-            --glass-bg: rgba(255, 255, 255, 0.1);
+            --emergency-orange: #ff8c00;
+            --deep-space: #0a0b10;
+            --glass-bg: rgba(0, 242, 255, 0.05);
         }
 
         body {
             background-color: var(--deep-space);
-            color: white;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            background-image: radial-gradient(circle at center, #1b2735 0%, #090a0f 100%);
-            overflow-x: hidden;
-        }
-
-        /* Navigáció */
-        nav {
-            width: 100%;
-            padding: 20px;
+            background-image: 
+                radial-gradient(circle at 50% 50%, rgba(0, 242, 255, 0.1) 0%, transparent 80%),
+                url('https://www.transparenttextures.com/patterns/stardust.png');
+            color: var(--neon-cyan);
+            font-family: 'Share Tech Mono', monospace;
             display: flex;
             justify-content: center;
-            gap: 30px;
-            background: rgba(0, 0, 0, 0.5);
-            border-bottom: 2px solid var(--neon-cyan);
-        }
-
-        nav a {
-            color: var(--neon-cyan);
-            text-decoration: none;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            transition: 0.3s;
-        }
-
-        nav a:hover {
-            color: var(--neon-orange);
-            text-shadow: 0 0 10px var(--neon-orange);
-        }
-
-        /* Login Box - Glassmorphism */
-        .login-container {
-            margin-top: 50px;
-            background: var(--glass-bg);
-            backdrop-filter: blur(15px);
-            padding: 40px;
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 0 30px rgba(0, 242, 255, 0.2);
-            text-align: center;
-            width: 350px;
-        }
-
-        .login-container h1 {
-            color: var(--neon-orange);
-            margin-bottom: 30px;
-            text-shadow: 0 0 10px var(--neon-orange);
-        }
-
-        input {
-            width: 90%;
-            padding: 12px;
-            margin: 10px 0;
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid var(--neon-cyan);
-            color: white;
-            border-radius: 5px;
-        }
-
-        .btn-login {
-            background: var(--neon-orange);
-            color: var(--deep-space);
-            border: none;
-            padding: 12px 30px;
-            border-radius: 5px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 20px;
-            transition: 0.3s;
-        }
-
-        .btn-login:hover {
-            box-shadow: 0 0 20px var(--neon-orange);
-            transform: scale(1.05);
-        }
-
-        /* Sectors Grid */
-        .sector-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            margin: 50px 0;
-            max-width: 1000px;
-        }
-
-        .sector-btn {
-            background: rgba(0, 242, 255, 0.05);
-            border: 2px solid var(--neon-cyan);
-            color: var(--neon-cyan);
-            padding: 30px;
-            font-size: 1.1em;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: 0.4s;
-            text-align: center;
-            position: relative;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
             overflow: hidden;
         }
 
-        .sector-btn:hover {
-            background: var(--neon-cyan);
-            color: var(--deep-space);
-            box-shadow: 0 0 25px var(--neon-cyan);
+        #terminal-container {
+            width: 400px;
+            padding: 30px;
+            border: 2px solid var(--neon-cyan);
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.2);
+            text-align: center;
+            position: relative;
         }
 
-        .sector-btn span {
+        #terminal-container::before {
+            content: "SYSTEM ID: KEPLER-452B-OS";
+            position: absolute;
+            top: -12px;
+            left: 20px;
+            background: var(--deep-space);
+            padding: 0 10px;
+            font-size: 0.8rem;
+            color: var(--emergency-orange);
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--emergency-orange);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
             display: block;
-            font-size: 0.8em;
-            margin-bottom: 10px;
-            opacity: 0.8;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
         }
 
-        footer {
-            margin-top: auto;
-            padding: 20px;
-            font-size: 0.8em;
-            color: rgba(255, 255, 255, 0.5);
+        input {
+            width: 100%;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--neon-cyan);
+            color: white;
+            font-family: 'Share Tech Mono', monospace;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: transparent;
+            border: 1px solid var(--emergency-orange);
+            color: var(--emergency-orange);
+            font-family: 'Orbitron', sans-serif;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            text-transform: uppercase;
+        }
+
+        button:hover {
+            background: var(--emergency-orange);
+            color: var(--deep-space);
+            box-shadow: 0 0 15px var(--emergency-orange);
+        }
+
+        #status-msg {
+            margin-top: 20px;
+            font-size: 0.8rem;
+            height: 20px;
+        }
+
+        .scanline {
+            width: 100%;
+            height: 2px;
+            background: rgba(0, 242, 255, 0.1);
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            animation: scan 4s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { top: 0; }
+            100% { top: 100%; }
         }
     </style>
 </head>
 <body>
 
-    <nav>
-        <a href="#">Karakterlap</a>
-        <a href="#">Küldetések</a>
-        <a href="#">Mellékküldetések</a>
-        <a href="#">Szimulátor</a>
-    </nav>
-
-    <div class="login-container">
-        <h1>NEWTON-1 AUTH</h1>
-        <p>Azonosítsa magát, Kadét!</p>
-        <input type="text" placeholder="Felhasználónév">
-        <input type="password" placeholder="Jelszó">
-        <button class="btn-login">BELÉPÉS</button>
+<div id="terminal-container">
+    <div class="scanline"></div>
+    <h1>Mission Control</h1>
+    <p>Newton-1 Túlélő Azonosítás</p>
+    
+    <div class="input-group">
+        <label>SZEMÉLYI AZONOSÍTÓ (NÉV):</label>
+        <input type="text" id="student-name" placeholder="Példa: Kovács János">
     </div>
 
-    <div class="sector-grid">
-        <div class="sector-btn">
-            <span>SZEKTOR 1</span>
-            ERŐ ÉS HATÁSAI
-        </div>
-        <div class="sector-btn">
-            <span>SZEKTOR 2</span>
-            NEWTON I. TÖRVÉNYE
-        </div>
-        <div class="sector-btn">
-            <span>SZEKTOR 3</span>
-            NEWTON II. TÖRVÉNYE
-        </div>
-        <div class="sector-btn">
-            <span>SZEKTOR 4</span>
-            GRAVITÁCIÓ ÉS SÚLY
-        </div>
-        <div class="sector-btn">
-            <span>SZEKTOR 5</span>
-            SÚRLÓDÁS
-        </div>
-        <div class="sector-btn">
-            <span>SZEKTOR 6</span>
-            KÖZEGELLENÁLLÁS
-        </div>
+    <div class="input-group">
+        <label>HOZZÁFÉRÉSI KÓD (JELSZÓ):</label>
+        <input type="password" id="student-pass" placeholder="****">
     </div>
 
-    <footer>
-        NEWTON-1 HAJÓFEDÉLZETI SZÁMÍTÓGÉP v1.0.4 | KEPLER-452B RENDSZER
-    </footer>
+    <button onclick="login()">Rendszer Belépés</button>
+
+    <div id="status-msg"></div>
+</div>
+
+<script>
+    // IDE MÁSOLD MAJD A GOOGLE SHEETS CSV LINKJÉT
+    const CSV_URL = 'IDE_JÖN_A_PUBLIKÁLT_CSV_LINKED';
+
+    async function login() {
+        const name = document.getElementById('student-name').value;
+        const pass = document.getElementById('student-pass').value;
+        const status = document.getElementById('status-msg');
+
+        if (!name || !pass) {
+            status.innerText = "HIBA: Adatok kitöltése kötelező!";
+            status.style.color = "red";
+            return;
+        }
+
+        status.innerText = "Kapcsolódás a Newton-1 adatbankhoz...";
+        status.style.color = "var(--neon-cyan)";
+
+        try {
+            const response = await fetch(CSV_URL);
+            const data = await response.text();
+            
+            // CSV sorokra bontása
+            const rows = data.split('\n').map(row => row.split(','));
+            
+            // Keresés a sorok között (Név: 0. oszlop, Jelszó: 1. oszlop)
+            const student = rows.find(r => r[0].trim() === name && r[1].trim() === pass);
+
+            if (student) {
+                const points = student[26]; // AA oszlop (TotalPoints)
+                const rank = student[28];   // Level oszlop
+                status.innerText = `Üdvözöljük, ${rank}! Belépés engedélyezve.`;
+                status.style.color = "lightgreen";
+                
+                // Itt irányíthatod át a következő oldalra
+                // window.location.href = "sector1.html"; 
+            } else {
+                status.innerText = "HIBA: Ismeretlen azonosító vagy kód!";
+                status.style.color = "red";
+            }
+        } catch (error) {
+            status.innerText = "RENDSZERHIBA: Nem sikerült elérni az adatbázist.";
+            console.error(error);
+        }
+    }
+</script>
 
 </body>
 </html>
