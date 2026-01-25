@@ -174,7 +174,7 @@
     let isFlying = false;
     let currentDist = 0;
 
-    // --- GOOGLE APPS SCRIPT LINK ---
+    // --- 1. KONFIGURÁCIÓ: A TE SAJÁT LINKED ---
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxbpZ-9dnlSlpVWGAqFmQCpNLELkg1YcVRboxv-Fsch3FlzGkV7mb6kP4cz8NJ4EmQClA/exec"; 
 
     const fS = document.getElementById('f-slider');
@@ -203,17 +203,13 @@
         const groundY = canvas.height - 40;
         ctx.fillStyle = "white";
         for(let i=0; i<20; i++) ctx.fillRect((i*57)%canvas.width, (i*23)%canvas.height, 1, 1);
-
         const springEndX = isFlying ? 60 : shipX;
         ctx.strokeStyle = "#ff8c00";
         ctx.lineWidth = 3;
         ctx.beginPath();
         ctx.moveTo(10, groundY - 20);
-        for(let i=0; i<=12; i++) {
-            ctx.lineTo(10 + i*((springEndX-10)/12), groundY - 20 + (i%2==0 ? 10 : -10));
-        }
+        for(let i=0; i<=12; i++) { ctx.lineTo(10 + i*((springEndX-10)/12), groundY - 20 + (i%2==0 ? 10 : -10)); }
         ctx.stroke();
-
         ctx.save();
         ctx.translate(shipX, groundY - 20);
         ctx.fillStyle = "#00f2ff";
@@ -284,6 +280,7 @@
         userAnswers[qIdx] = oIdx;
     }
 
+    // --- 2. JAVÍTOTT ELLENŐRZÉS ÉS PONTKÜLDÉS ---
     function checkQuiz() {
         let score = 0;
         quizData.forEach((d, i) => { if(userAnswers[i] === d.c) score++; });
@@ -291,32 +288,24 @@
         res.style.display = "block";
         res.innerHTML = `DIAGNÓZIS: ${score} / ${quizData.length} adat helyes.`;
         
-       if(score === quizData.length) {
-    res.style.borderColor = "#00f2ff";
-    res.style.color = "#00f2ff";
-    // FONTOS: két paraméter kell! A pontszám és az "sm1" szöveg idézőjelben.
-    sendPoints(10, "sm1"); 
-} else {
+        if(score === quizData.length) {
+            res.style.borderColor = "#00f2ff";
+            res.style.color = "#00f2ff";
+            // KÜLDJÜK A PONTOT ÉS AZ AZONOSÍTÓT!
+            sendPoints(10, "sm1"); 
+        } else {
             res.style.borderColor = "#ff8c00";
             res.style.color = "#ff8c00";
         }
     }
 
+    // --- 3. JAVÍTOTT ADATKÜLDŐ FÜGGVÉNY ---
     function sendPoints(points, missionId) {
-    const userData = JSON.parse(localStorage.getItem('currentUser'));
-    // Itt is fontos a SCRIPT_URL megléte!
-    if(!userData || !SCRIPT_URL) return;
-
-    // Ebben a sorban adjuk hozzá a &mission= részt az URL-hez
-    const finalUrl = `${SCRIPT_URL}?name=${encodeURIComponent(userData.name)}&points=${points}&mission=${missionId}`;
-
-    fetch(finalUrl, {
-        method: 'GET',
-        mode: 'no-cors'
-    })
-    .then(() => alert("ADATOK SZINKRONIZÁLVA!"))
-    .catch(err => console.error("Hiba:", err));
-}
+        const userData = JSON.parse(localStorage.getItem('currentUser'));
+        if(!userData || !SCRIPT_URL) {
+            console.error("Hiba: Nincs bejelentkezett felhasználó vagy SCRIPT_URL!");
+            return;
+        }
 
         const finalUrl = `${SCRIPT_URL}?name=${encodeURIComponent(userData.name)}&points=${points}&mission=${missionId}`;
 
@@ -324,7 +313,7 @@
             method: 'GET',
             mode: 'no-cors'
         })
-        .then(() => alert("KÜLDETÉS TELJESÍTVE! Adatok szinkronizálva az L1_HW táblázattal."))
+        .then(() => alert("KÜLDETÉS TELJESÍTVE! Adatok rögzítve az I oszlopban."))
         .catch(err => console.error("Hiba:", err));
     }
 
@@ -333,5 +322,6 @@
 
 </body>
 </html>
+
 
 
