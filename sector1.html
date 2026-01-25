@@ -18,6 +18,7 @@
             font-family: 'Share Tech Mono', monospace;
             margin: 0;
             padding: 20px;
+            overflow-x: hidden;
         }
 
         header {
@@ -35,114 +36,106 @@
             font-family: 'Orbitron'; 
             border: 1px solid var(--orange); 
             padding: 5px 15px;
-            transition: 0.3s;
-        }
-        
-        .back-btn:hover {
-            background: var(--orange);
-            color: var(--bg);
         }
 
-        /* Prológus konténer */
-        .briefing-box {
+        /* Prológus Elrendezés */
+        .prologue-section {
             display: flex;
-            flex-wrap: wrap;
-            gap: 30px;
             margin-top: 30px;
-            background: rgba(0, 242, 255, 0.03);
-            border: 1px solid rgba(0, 242, 255, 0.2);
-            padding: 30px;
+            gap: 40px;
             align-items: flex-start;
         }
 
-        .briefing-text {
-            flex: 1;
-            min-width: 300px;
+        .text-container {
+            flex: 2;
         }
 
-        .briefing-text h2 {
-            font-family: 'Orbitron';
-            color: var(--orange);
-            margin-top: 0;
-            letter-spacing: 2px;
-            border-bottom: 1px aria-solid var(--orange);
-            display: inline-block;
-            margin-bottom: 20px;
-        }
-
-        /* SORKIZÁRT SZÖVEG BEÁLLÍTÁSA */
-      .mission-text {
-    line-height: 1.8;
-    text-align: justify;
-    hyphens: auto; /* Ha a böngésző támogatja, elválasztja a hosszú szavakat */
-    padding-right: 10px; /* Egy kis margó a kép előtt */
-}
-
-        .briefing-image {
-            flex: 0 0 400px;
-            border: 2px solid var(--cyan);
-            box-shadow: 0 0 20px rgba(0, 242, 255, 0.2);
-            background: #000;
+        /* Írógép effektus és sárga kurzor */
+        .typewriter-text {
+            line-height: 1.8;
+            text-align: justify;
+            font-size: 1.1rem;
+            color: #e0faff;
             position: relative;
+            display: inline;
         }
 
-        .briefing-image img {
+        .typewriter-text::after {
+            content: "";
+            display: inline-block;
+            width: 10px;
+            height: 1.2rem;
+            background-color: var(--orange);
+            margin-left: 5px;
+            vertical-align: middle;
+            animation: blink 0.8s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        /* Kép stílusa: Jobb oldalt, fele akkora */
+        .image-container {
+            flex: 0 0 250px; /* Lefelezve (kb. 250px széles) */
+            border: 1px solid var(--cyan);
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.2);
+            background: #000;
+        }
+
+        .image-container img {
             width: 100%;
             height: auto;
             display: block;
-            opacity: 0.9;
+            filter: sepia(0.3) hue-rotate(150deg); /* Kékes sci-fi filter */
         }
 
-        .briefing-image::after {
-            content: "SCANNING...";
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            font-size: 0.7rem;
-            color: var(--cyan);
-            background: rgba(0,0,0,0.7);
-            padding: 2px 5px;
-        }
-
-        /* Feladat kártya */
-        .task-card {
-            margin-top: 40px;
-            border-left: 4px solid var(--orange);
-            background: rgba(255, 140, 0, 0.05);
-            padding: 25px;
-        }
-
-        .task-card h3 {
+        h2 {
             font-family: 'Orbitron';
-            margin-top: 0;
             color: var(--orange);
+            margin-top: 0;
+            letter-spacing: 3px;
         }
     </style>
 </head>
 <body>
 
     <header>
-        <div style="font-family: 'Orbitron'; letter-spacing: 2px;">STATUS: MISSION_01_RECOVERY</div>
-        <a href="sectors.html" class="back-btn">VISSZA A SZEKTOROKHOZ</a>
+        <div style="font-family: 'Orbitron';">MISSION LOG: SECTOR_01</div>
+        <a href="sectors.html" class="back-btn">< VISSZA</a>
     </header>
 
-    <div class="briefing-box">
-        <div class="briefing-text">
+    <div class="prologue-section">
+        <div class="text-container">
             <h2>PROLÓGUS</h2>
-            <div class="mission-text">
-               A galaxis nyugati spirálkarjának egyik kifejezetten jelentéktelen szegletében a Newton-1 kutatóhajó legénysége éppen azon vitatkozott, hogy a szintetikus kávé miért hasonlít ízében egy használt ionhajtómű hűtővizére, ami egyébként egyike azon kevés kozmikus rejtélyeknek, amelyekre még a szuperszámítógépek sem tudnak megnyugtató választ adni. Ez volt az utolsó értelmes gondolatuk, mielőtt a Kepler-452b narancssárga, kénszagú atmoszférája úgy döntött, hogy szorosabb barátságot köt a hajó burkolatával, fittyet hányva a jó ízlésre és a menetrendre. A katasztrófa oka egy sajnálatos gravitációs anomália volt, és miközben a hajófedélzeti számítógép még udvariasan megjegyezte, hogy a bolygó éppen most készül palacsintává lapítani mindenkit. Amikor a por leülepedett – vagy legalábbis megpróbált –, a Newton-1 roncsa úgy festett a narancssárga ködben, mint egy óriási fém-articsóka, amit egy dühös óriás rágott meg. Fojtogató füst gomolygott a roncsok közül, és a legénység tagjai, akik eddig a biztonsági öveik és a légzsákok jótékony tehetetlenség-gátló hatásában bíztak, most feltűnő nehézkedéssel küzdve másztak ki a kettétört törzsből. Elsőként a Pilóta bukkant fel, egy ember, aki képes lenne egy téglafalat is navigálni, feltéve, ha van rajta elég hajtómű, és aki szentül hiszi, hogy a tehetetlenség törvénye csak egy barátságos javaslat. Őt követte a Műszerész, aki már most a roncsok alakváltozását elemezte , és halkan szitkozódott, mert a kedvenc villáskulcsa éppen most hajtott végre egy végleges távozást a mélybe. A Technológus és a Tudós egymást segítve kászálódtak ki a füstölgő kabinból. A Technológus már a narancssárga por láttán a tapadási súrlódáson kezdett el mélabúsan morfondírozni; szerinte ugyanis a galaktikus menekülés nem más, mint a súrlódás elkerülésének magas szintű művészete. Eközben a Tudós – aki leginkább egy két lábon járó, kissé pánikoló számológépre emlékeztetett – még mindig azon rágódott, hogy a becsapódás közbeni, igencsak barátságtalan mértékű gyorsulás nem tette-e végleg tönkre a frizurájátt. Ahogy ott ácsorogtak a füstös, idegen tájon, hirtelen megvilágosodtak: ugyanazok a brutális erőhatások , amelyek oly kíméletlenül megváltoztatták a hajójuk mozgásállapotát, egyúttal a hajtómű fúvókáit és a navigációs chipeket is szerteszét szórták a bolygó barátságtalan pontjain. Odakint a sötétben valami kattogott, valami éhes volt, és a legénységnek rá kellett döbbennie: ha nem akarják, hogy a félresikerült landolás legyen az utolsó fizikai élményük ebben a megmagyarázhatatlanul narancssárga univerzumban, sürgősen építeniük kell valamit, ami legalább nyomokban tartalmaz egy működő rakétát.
+            <div id="typed-text" class="typewriter-text"></div>
         </div>
 
-        <div class="briefing-image">
-            <img src="images/sector1.png">
+        <div class="image-container">
+            <img src="images/sector1.png" alt="Newton-1 roncsok">
         </div>
     </div>
 
-    <div class="task-card">
-        <h3>1. fázis: Erő és alakváltozás</h3>
-        <p>A tankönyv 40. oldala alapján vizsgáld meg a roncsokat. Amikor egy tárgyra (például a hajóburkolatra) erő hat, megváltozhat a test alakja vagy a mozgásállapota.</p>
-        <p><i>Kérdés: Milyen alakváltozást látsz a fenti képen a hajótesten? (Rugalmas vagy maradandó?)</i></p>
-    </div>
+    <script>
+        // A szöveged sorkizárt kiíráshoz
+        const text = "A galaxis nyugati spirálkarjának egyik kifejezetten jelentéktelen szegletében a Newton-1 kutatóhajó legénysége éppen azon vitatkozott, hogy a szintetikus kávé miért hasonlít ízében egy használt ionhajtómű hűtővizére, ami egyébként egyike azon kevés kozmikus rejtélyeknek, amelyekre még a szuperszámítógépek sem tudnak megnyugtató választ adni. Ez volt az utolsó értelmes gondolatuk, mielőtt a Kepler-452b narancssárga, kénszagú atmoszférája úgy döntött, hogy szorosabb barátságot köt a hajó burkolatával, fittyet hányva a jó ízlésre és a menetrendre. A katasztrófa oka egy sajnálatos gravitációs anomália volt, és miközben a hajófedélzeti számítógép még udvariasan megjegyezte, hogy a bolygó éppen most készül palacsintává lapítani mindenkit. Amikor a por leülepedett – vagy legalábbis megpróbált –, a Newton-1 roncsa úgy festett a narancssárga ködben, mint egy óriási fém-articsóka, amit egy dühös óriás rágott meg. Fojtogató füst gomolygott a roncsok közül, és a legénység tagjai, akik eddig a biztonsági öveik és a légzsákok jótékony tehetetlenség-gátló hatásában bíztak, most feltűnő nehézkedéssel küzdve másztak ki a kettétört törzsből. Elsőként a Pilóta bukkant fel, egy ember, aki képes lenne egy téglafalat is navigálni, feltéve, ha van rajta elég hajtómű, és aki szentül hiszi, hogy a tehetetlenség törvénye csak egy barátságos javaslat. Őt követte a Műszerész, aki már most a roncsok alakváltozását elemezte , és halkan szitkozódott, mert a kedvenc villáskulcsa éppen most hajtott végre egy végleges távozást a mélybe. A Technológus és a Tudós egymást segítve kászálódtak ki a füstölgő kabinból. A Technológus már a narancssárga por láttán a tapadási súrlódáson kezdett el mélabúsan morfondírozni; szerinte ugyanis a galaktikus menekülés nem más, mint a súrlódás elkerülésének magas szintű művészete. Eközben a Tudós – aki leginkább egy két lábon járó, kissé pánikoló számológépre emlékeztetett – még mindig azon rágódott, hogy a becsapódás közbeni, igencsak barátságtalan mértékű gyorsulás nem tette-e végleg tönkre a frizurájátt. Ahogy ott ácsorogtak a füstös, idegen tájon, hirtelen megvilágosodtak: ugyanazok a brutális erőhatások , amelyek oly kíméletlenül megváltoztatták a hajójuk mozgásállapotát, egyúttal a hajtómű fúvókáit és a navigációs chipeket is szerteszét szórták a bolygó barátságtalan pontjain. Odakint a sötétben valami kattogott, valami éhes volt, és a legénységnek rá kellett döbbennie: ha nem akarják, hogy a félresikerült landolás legyen az utolsó fizikai élményük ebben a megmagyarázhatatlanul narancssárga univerzumban, sürgősen építeniük kell valamit, ami legalább nyomokban tartalmaz egy működő rakétát.";
+        
+        let i = 0;
+        const speed = 40; // Sebesség ms-ban
+        const target = document.getElementById("typed-text");
+
+        function typeWriter() {
+            if (i < text.length) {
+                target.innerHTML += text.charAt(i);
+                i++;
+                setTimeout(typeWriter, speed);
+            }
+        }
+
+        // Indítás betöltéskor
+        window.onload = typeWriter;
+    </script>
 
 </body>
 </html>
