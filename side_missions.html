@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <title>Kepler-452b - Mellékküldetések</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root { --cyan: #00f2ff; --orange: #ff8c00; --bg: #0a0b10; --locked: #222; }
+        body { background: var(--bg); color: var(--cyan); font-family: 'Share Tech Mono', monospace; padding: 20px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; max-width: 1200px; margin: 40px auto; }
+        .card { padding: 20px; border: 2px solid var(--cyan); background: rgba(0, 242, 255, 0.05); text-align: center; transition: 0.3s; }
+        .card.locked { border-color: var(--locked); color: #444; filter: grayscale(1); opacity: 0.5; }
+        .btn { display: block; margin-top: 15px; padding: 10px; border: 1px solid var(--cyan); color: var(--cyan); text-decoration: none; font-family: 'Orbitron'; }
+        .locked .btn { border-color: #444; color: #444; pointer-events: none; }
+    </style>
+</head>
+<body>
+    <h1 style="text-align:center; font-family: 'Orbitron'; color: var(--orange);">MELLÉKKÜLDETÉSEK</h1>
+    <div class="grid" id="side-grid"></div>
+
+    <script>
+        const userData = JSON.parse(localStorage.getItem('currentUser'));
+        const points = parseInt(userData.points);
+
+        const sideMissions = [
+            { id: 1, name: "S.M. 01", title: "TESZT: ERŐTAN", limit: 0, link: "sm1_test.html" },
+            { id: 2, name: "S.M. 02", title: "SZIMULÁCIÓ: DÜNE", limit: 10, link: "sm2_sim.html" },
+            { id: 3, name: "S.M. 03", title: "KAPCSOLAT: AZ AI", limit: 20, link: "sm3_chat.html" }
+        ];
+
+        const grid = document.getElementById('side-grid');
+        sideMissions.forEach(m => {
+            const isLocked = points < m.limit;
+            grid.innerHTML += `
+                <div class="card ${isLocked ? 'locked' : ''}">
+                    <h3>${m.name}</h3>
+                    <p>${m.title}</p>
+                    <small>Szükséges: ${m.limit} PT</small>
+                    <a href="${isLocked ? '#' : m.link}" class="btn">${isLocked ? 'ZÁROLT' : 'INDÍTÁS'}</a>
+                </div>
+            `;
+        });
+    </script>
+</body>
+</html>
