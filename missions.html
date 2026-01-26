@@ -138,27 +138,44 @@
         </a>
     </div>
 
-    <script>
-   const userData = JSON.parse(localStorage.getItem('currentUser'));
+<script>
+    // 1. Felhasználó ellenőrzése
+    const userData = JSON.parse(localStorage.getItem('currentUser'));
 
-if (!userData) {
-    window.location.href = "index.html";
-} else {
-    // Megjelenítjük a nevet, a rangot és a kasztot is
-    document.getElementById('user-name').innerText = 
-        `${userData.name.toUpperCase()} [${userData.type.toUpperCase()}]`;
-    
-    // Ha van rang kijelződ:
-    if(document.getElementById('display-level')) {
-        document.getElementById('display-level').innerText = userData.level;
+    if (!userData) {
+        window.location.href = "index.html";
+    } else {
+        // Alapadatok beállítása a fejlécben a belépési adatokból
+        document.getElementById('user-name').innerText = userData.name.toUpperCase();
+        
+        // Friss adatok lekérése a táblázatból (pontszám, típus)
+        loadHeaderStats(userData.name);
     }
-}
-    
-    </script>
+
+    // 2. Csak a fejlécet frissítő függvény (Főmenühöz)
+    async function loadHeaderStats(studentName) {
+        const scriptURL = "IDE_AZ_ÚJ_SCRIPT_URL_T"; // Ide jön az Apps Script URL-ed
+        const finalURL = `${scriptURL}?action=getStats&name=${encodeURIComponent(studentName)}`;
+        
+        try {
+            const response = await fetch(finalURL);
+            const data = await response.json();
+            
+            if(!data.error) {
+                // Csak azt frissítjük, ami ezen az oldalon tényleg létezik
+                const statusSpan = document.getElementById('user-name');
+                statusSpan.innerText = `${data.name.toUpperCase()} [${data.type.toUpperCase()}] | ${data.points} PT`;
+            }
+        } catch (e) {
+            console.error("Nem sikerült a táblázatból frissíteni az adatokat.");
+        }
+    }
+</script>
 
 </body>
 
 </html>
+
 
 
 
