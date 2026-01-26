@@ -1,0 +1,120 @@
+<div class="character-card">
+    <div class="char-image-container">
+        <img id="char-img" src="img/placeholder_character.png" alt="Karakter képe">
+        <div class="scanline"></div>
+    </div>
+
+    <div class="char-details">
+        <h1 id="student-name">Feltöltés alatt...</h1>
+        
+        <div class="stat-row">
+            <span class="label">OSZTÁLY:</span>
+            <span id="char-type" class="value">Ismeretlen</span>
+        </div>
+        
+        <div class="stat-row">
+            <span class="label">RANG:</span>
+            <span id="char-rank" class="value">Újonc</span>
+        </div>
+        
+        <div class="stat-row">
+            <span class="label">ÖSSZPONTSZÁM:</span>
+            <span id="char-points" class="value">0000</span>
+        </div>
+
+        <div class="xp-bar-container">
+            <div id="xp-fill" class="xp-fill" style="width: 20%;"></div>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --cyan: #00f2ff;
+        --orange: #ff8c00;
+        --bg-dark: #0a0b10;
+        --border-glow: rgba(0, 242, 255, 0.3);
+    }
+
+    .character-card {
+        display: flex;
+        background: rgba(10, 11, 16, 0.9);
+        border: 2px solid var(--cyan);
+        border-radius: 15px;
+        padding: 20px;
+        max-width: 600px;
+        box-shadow: 0 0 20px var(--border-glow);
+        font-family: 'Share Tech Mono', monospace;
+        margin: 20px auto;
+    }
+
+    .char-image-container {
+        position: relative;
+        width: 200px;
+        height: 250px;
+        border: 1px solid var(--cyan);
+        overflow: hidden;
+        background: #111;
+        margin-right: 25px;
+    }
+
+    .char-image-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        filter: brightness(0.8) contrast(1.2);
+    }
+
+    /* Animált szkennelési vonal a képen */
+    .scanline {
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 2px;
+        background: rgba(0, 242, 255, 0.5);
+        box-shadow: 0 0 10px var(--cyan);
+        animation: scan 3s linear infinite;
+    }
+
+    @keyframes scan {
+        0% { top: 0; }
+        100% { top: 100%; }
+    }
+
+    .char-details {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .char-details h1 {
+        font-family: 'Orbitron', sans-serif;
+        color: white;
+        text-transform: uppercase;
+        margin: 0 0 15px 0;
+        letter-spacing: 2px;
+        border-bottom: 1px solid var(--orange);
+    }
+
+    .stat-row {
+        margin: 8px 0;
+        font-size: 1.1rem;
+    }
+
+    .label { color: var(--orange); font-weight: bold; }
+    .value { color: var(--cyan); margin-left: 10px; }
+
+    /* XP Bar */
+    .xp-bar-container {
+        height: 8px;
+        background: #222;
+        border: 1px solid var(--cyan);
+        margin-top: 15px;
+        position: relative;
+    }
+
+    .xp-fill {
+        height: 100%;
+        background: var(--cyan);
+        box-shadow: 0 0 10px var(--cyan);
+    }
+</style>
