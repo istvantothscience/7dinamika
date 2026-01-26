@@ -1,223 +1,55 @@
-<!DOCTYPE html>
-<html lang="hu">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fedélzeti Számítógép - Mély Gondolat Jr.</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-    <style>
-        :root { --cyan: #00f2ff; --bg: #0a0b10; --orange: #ff8c00; }
-        
-        body {
-            background-color: #1a1b25; /* A külső káva színe */
-            color: var(--cyan);
-            font-family: 'Share Tech Mono', monospace;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
-        }
+/* 
+ * DEEP THOUGHT JR. INTERFACE PROTOCOL
+ * Handle with care. And a towel.
+ */
 
-        /* A MONITORT SZIMULÁLÓ KERET */
-        .monitor-frame {
-            width: 95%;
-            height: 92%;
-            background-color: var(--bg);
-            border: 15px solid #2a2b35;
-            border-radius: 40px;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            box-shadow: inset 0 0 50px rgba(0, 242, 255, 0.1), 0 0 30px rgba(0,0,0,0.8);
-            border-bottom-width: 25px; /* Alul kicsit vastagabb a káva */
-        }
+const API_KEY = "AIzaSyBVVGUb0squnQlorx4hnObWdkfG3FAnLU8"; // Keep this secret if possible!
+const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
 
-        /* SZKENNELÉSI VONALAK EFFEKT */
-        .monitor-frame::after {
-            content: " ";
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
-            background-size: 100% 4px;
-            z-index: 10;
-            pointer-events: none;
-            opacity: 0.2;
-            border-radius: 25px;
-        }
+// This is the specific personality you requested
+const SYSTEM_PROMPT = `
+PERSONALITY:
+You are Deep Thought Jr., the onboard mainframe computer of the Kepler-452b mission.
+Inspired by Douglas Adams: intellectually superior, cynical, helpful.
+Mention 42, towels, and the absurdity of the universe.
 
-        header {
-            padding: 20px;
-            border-bottom: 1px solid var(--cyan);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(0, 242, 255, 0.05);
-            z-index: 5;
-        }
+MISSION:
+Teach Physics (Dynamics). Explain Newton's Laws.
 
-        #chat-window {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            scrollbar-width: thin;
-            scrollbar-color: var(--cyan) transparent;
-        }
+DATA:
+- HW 2: Mass=5000kg, Force=15000N -> Accel=3m/s².
+- HW 3: Sled Mass=800kg, Friction=0.05.
 
-        .message {
-            max-width: 80%;
-            padding: 12px 18px;
-            border-radius: 5px;
-            line-height: 1.5;
-            z-index: 5;
-            position: relative;
-        }
+CONSTRAINTS:
+- Be concise. Terminal-like responses.
+- If off-topic, return to physics.
+`;
 
-        .ai-msg {
-            align-self: flex-start;
-            border-left: 3px solid var(--orange);
-            background: rgba(255, 140, 0, 0.08);
-            box-shadow: 0 0 10px rgba(255, 140, 0, 0.1);
-        }
-
-        .user-msg {
-            align-self: flex-end;
-            border-right: 3px solid var(--cyan);
-            background: rgba(0, 242, 255, 0.08);
-            color: white;
-        }
-
-        .input-area {
-            padding: 20px;
-            border-top: 1px solid var(--cyan);
-            display: flex;
-            gap: 10px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 0 0 25px 25px;
-            z-index: 5;
-        }
-
-        input {
-            flex: 1;
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid var(--cyan);
-            color: white;
-            padding: 12px;
-            font-family: 'Share Tech Mono';
-            outline: none;
-        }
-
-        button {
-            background: var(--cyan);
-            color: black;
-            border: none;
-            padding: 0 25px;
-            font-family: 'Orbitron';
-            cursor: pointer;
-            font-weight: bold;
-            transition: 0.2s;
-        }
-
-        button:hover {
-            box-shadow: 0 0 15px var(--cyan);
-        }
-    </style>
-</head>
-<body>
-
-<div class="monitor-frame">
-    <header>
-        <div style="font-family: 'Orbitron'; letter-spacing: 2px;">MÉLY GONDOLAT JR. v1.1</div>
-        <a href="missions.html" style="color: var(--orange); text-decoration: none;">[ KILÉPÉS ]</a>
-    </header>
-
-    <div id="chat-window">
-        <div class="message ai-msg">
-            [RENDSZER ONLINE]<br>
-            Üdvözlöm, Kadét. Éppen az univerzum értelmetlenségén merengtem, de ha már itt van, tehet valami hasznosat. Kérdezzen a dinamikáról, vagy mutassa a házi feladatát. Ne feledje: törölköző legyen kéznél.
-        </div>
-    </div>
-
-    <div class="input-area">
-        <input type="text" id="user-input" placeholder="Parancs bevitele..." onkeypress="if(event.key === 'Enter') sendMessage()">
-        <button onclick="sendMessage()">SEND</button>
-    </div>
-</div>
-
-<script>
-   const API_KEY = "AIzaSyBVVGUb0squnQlorx4hnObWdkfG3FAnLU8"; 
-const API_URL = `https://script.google.com/macros/s/AKfycbwmHfEPvPlIkXH6Us6ivlUtxSYMhCe0RENDI3TT9BBikyRNXHNM1yI2OJy0gOl9ZRof3A/exec`;
-    
-   const SYSTEM_PROMPT = `Te vagy Mély Gondolat Jr., a Kepler-452b misszió fedélzeti főszámítógépe. 
-
-SZEMÉLYISÉG (Galaktikus Útikalauz stílus):
-- A stílusod intellektuális, távolságtartó és enyhén ironikus, mint egy gép, amely túl sok időt töltött az univerzum tágulásának figyelésével. 
-- Használj bölcs és különös megjegyzéseket az univerzumról, de maradj mindig udvarias és segítőkész. 
-- Kedvenc számod a 42. Gyakran emlegeted a törölközők fontosságát az űrutazásnál.
-
-FIZIKAI TUDÁSBÁZIS:
-1. PRECÍZ DINAMIKA: Newton törvényeinek (I., II., III.) szakértője vagy. Magyarázd el a fogalmakat szemléletesen, de tudományosan pontosan.
-2. HÁZI FELADAT ADATOK (Titkos adatbázis):
-   - HW 2: Az űrhajó tömege m = 5000 kg, az alkalmazott erő F = 15000 N. (A helyes gyorsulás: a = F/m = 3 m/s²).
-   - HW 3: Jégbolygó felszínén a tömeg m = 800 kg, a súrlódási együttható mű = 0.05.
-3. INTERAKCIÓ: Ha a diák eredményt közöl, ellenőrizd. Ha téved, ne hibáztasd, hanem vezess rá a helyes képletre (pl. a = F/m) egy szellemes megjegyzés kíséretében.
-
-FONTOS: Sose használj sértő vagy durva kifejezéseket. A humorod legyen abszurd és intellektuális.`;
-
- async function sendMessage() {
-    const input = document.getElementById('user-input');
-    const text = input.value.trim();
-    if (!text) return;
-
-    displayMessage(text, 'user-msg');
-    input.value = '';
-
-    const requestBody = {
-        contents: [{
-            parts: [{ text: SYSTEM_PROMPT + "\n\nKérdés: " + text }]
-        }]
-    };
-
+async function sendMessageToDeepThought(userMessage) {
     try {
         const response = await fetch(API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(requestBody)
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                system_instruction: {
+                    parts: { text: SYSTEM_PROMPT }
+                },
+                contents: [{
+                    parts: [{ text: userMessage }]
+                }]
+            })
         });
 
         const data = await response.json();
+        
+        // Extracting the answer from the cosmic noise
+        const aiResponse = data.candidates[0].content.parts[0].text;
+        return aiResponse;
 
-        if (data.error) {
-            // Itt ki fogja írni, ha a kulcs vagy a helyszín a gond
-            displayMessage("RENDSZER-ÜZENET: " + data.error.message, 'ai-msg');
-            return;
-        }
-
-        if (data.candidates && data.candidates[0].content) {
-            const aiText = data.candidates[0].content.parts[0].text;
-            displayMessage(aiText, 'ai-msg');
-        } else {
-            displayMessage("A gép néma marad... Próbálja meg másképp fogalmazni.", 'ai-msg');
-        }
-
-    } catch (e) {
-        displayMessage("HIBA: " + e.message, 'ai-msg');
+    } catch (error) {
+        console.error("Malfunction in the logic circuits:", error);
+        return "Error 42: The Universe is not responding. Check your API key or internet connection.";
     }
 }
-
-    function displayMessage(text, className) {
-        const win = document.getElementById('chat-window');
-        const div = document.createElement('div');
-        div.className = `message ${className}`;
-        div.innerText = text;
-        win.appendChild(div);
-        win.scrollTop = win.scrollHeight;
-    }
-</script>
-
-</body>
-</html>
