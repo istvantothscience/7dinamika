@@ -5,14 +5,74 @@
     <title>Karakter Profil - Kepler-452b</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
-        /* Ide másold be a korábbi Character Card CSS-t (neon keret, flexbox stb.) */
-        body { background: #0a0b10; color: #00f2ff; font-family: 'Share Tech Mono'; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .card { border: 2px solid #00f2ff; padding: 20px; display: flex; gap: 20px; background: rgba(0,0,0,0.8); box-shadow: 0 0 20px rgba(0,242,255,0.2); border-radius: 15px; }
-        #char-img { width: 200px; height: 250px; border: 1px solid #00f2ff; object-fit: cover; }
-        .info h1 { font-family: 'Orbitron'; margin-top: 0; border-bottom: 2px solid #ff8c00; }
-        .stat { margin: 10px 0; font-size: 1.2rem; }
-        .label { color: #ff8c00; }
-        .back-btn { position: absolute; top: 20px; left: 20px; color: #00f2ff; text-decoration: none; border: 1px solid #00f2ff; padding: 5px 15px; }
+        :root {
+            --neon-cyan: #00f2ff;
+            --emergency-orange: #ff8c00;
+            --deep-space: #0a0b10;
+        }
+
+        body { 
+            background: var(--deep-space); 
+            color: var(--neon-cyan); 
+            font-family: 'Share Tech Mono', monospace; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0;
+            background-image: radial-gradient(circle at 50% 50%, rgba(0, 242, 255, 0.05) 0%, transparent 80%);
+        }
+
+        .card { 
+            border: 2px solid var(--neon-cyan); 
+            padding: 30px; 
+            display: flex; 
+            gap: 30px; 
+            background: rgba(0,0,0,0.85); 
+            box-shadow: 0 0 30px rgba(0,242,255,0.2); 
+            border-radius: 20px; 
+            min-width: 550px;
+            position: relative;
+        }
+
+        /* Szkennelés effekt a kártyán */
+        .card::before {
+            content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 2px;
+            background: rgba(0, 242, 255, 0.2); box-shadow: 0 0 10px var(--neon-cyan);
+            animation: scan 4s linear infinite;
+        }
+
+        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
+
+        #char-img { 
+            width: 220px; height: 280px; 
+            border: 1px solid var(--neon-cyan); 
+            object-fit: cover; 
+            background: #111;
+            filter: brightness(0.9) contrast(1.1) sepia(0.2) hue-rotate(-20deg);
+        }
+
+        .info { display: flex; flex-direction: column; justify-content: center; }
+        .info h1 { 
+            font-family: 'Orbitron'; 
+            margin: 0 0 15px 0; 
+            border-bottom: 2px solid var(--emergency-orange); 
+            padding-bottom: 5px;
+            letter-spacing: 2px;
+        }
+
+        .stat { margin: 12px 0; font-size: 1.3rem; }
+        .label { color: var(--emergency-orange); font-weight: bold; text-transform: uppercase; }
+        .value { color: #fff; margin-left: 10px; }
+
+        .back-btn { 
+            position: absolute; top: 20px; left: 20px; 
+            color: var(--neon-cyan); text-decoration: none; 
+            border: 1px solid var(--neon-cyan); padding: 8px 20px; 
+            font-family: 'Orbitron'; font-size: 0.8rem;
+        }
+
+        .back-btn:hover { background: var(--neon-cyan); color: #000; }
     </style>
 </head>
 <body>
@@ -22,42 +82,55 @@
     <div class="card">
         <img id="char-img" src="img/placeholder.png">
         <div class="info">
-            <h1 id="student-name">TÖLTÉS...</h1>
-            <div class="stat"><span class="label">KASZT:</span> <span id="char-type">-</span></div>
-            <div class="stat"><span class="label">RANG:</span> <span id="char-rank">-</span></div>
-            <div class="stat"><span class="label">PONT:</span> <span id="char-points">0</span></div>
+            <h1 id="student-name">...</h1>
+            <div class="stat"><span class="label">KASZT:</span> <span id="char-type" class="value">-</span></div>
+            <div class="stat"><span class="label">RANG:</span> <span id="char-rank" class="value">-</span></div>
+            <div class="stat"><span class="label">PONT:</span> <span id="char-points" class="value">0</span></div>
         </div>
     </div>
 
     <script>
-        const userData = JSON.parse(localStorage.getItem('currentUser'));
-        const scriptURL = "IDE_AZ_ÚJ_SCRIPT_URL_T";
+        function initCharacter() {
+            // 1. Adatok kiolvasása a localStorage-ból
+            const userData = JSON.parse(localStorage.getItem('currentUser'));
 
-        if (userData) {
-            loadCharacter();
+            if (!userData) {
+                window.location.href = "index.html"; // Ha nincs belépve, vissza a startra
+                return;
+            }
+
+            const name = userData.name || "Ismeretlen Kadét";
+            const type = userData.characterType || userData.type || "Tudos"; // Megnézzük mindkét lehetséges kulcsot
+            const points = parseInt(userData.totalPoints || userData.points || 0);
+
+            // 2. Szintszámítás (A te határértékeid alapján)
+            let lvl = 1; 
+            let rank = "Újonc";
+            
+            if (points > 90) { lvl = 5; rank = "Parancsnok"; }
+            else if (points > 70) { lvl = 4; rank = "Hadnagy"; }
+            else if (points > 50) { lvl = 3; rank = "Tisztjelölt"; }
+            else if (points > 40) { lvl = 2; rank = "Kadét"; }
+
+            // 3. UI frissítése
+            document.getElementById('student-name').innerText = name.toUpperCase();
+            document.getElementById('char-type').innerText = type.toUpperCase();
+            document.getElementById('char-points').innerText = points + " PT";
+            document.getElementById('char-rank').innerText = `${rank} (LVL ${lvl})`;
+
+            // 4. Kép beállítása (pl. img/Tudos_2.png)
+            // Fontos: a fájlnévben ne legyen ékezet!
+            const imgPath = `img/${type}_${lvl}.png`;
+            document.getElementById('char-img').src = imgPath;
+
+            // Hibakezelés, ha nincs meg a kép
+            document.getElementById('char-img').onerror = function() {
+                this.src = 'img/placeholder.png'; // Biztonsági kép, ha a fájl hiányzik
+            };
         }
 
-        async function loadCharacter() {
-            const url = `${scriptURL}?action=getStats&name=${encodeURIComponent(userData.name)}`;
-            try {
-                const resp = await fetch(url);
-                const data = await resp.json();
-                
-                document.getElementById('student-name').innerText = data.name.toUpperCase();
-                document.getElementById('char-type').innerText = data.type;
-                document.getElementById('char-points').innerText = data.points;
-
-                // Szintszámítás
-                let lvl = 1; let r = "Újonc";
-                if(data.points > 100) { lvl = 2; r = "Kadét"; }
-                if(data.points > 300) { lvl = 3; r = "Tisztjelölt"; }
-                if(data.points > 600) { lvl = 4; r = "Hadnagy"; }
-                if(data.points > 1000) { lvl = 5; r = "Parancsnok"; }
-
-                document.getElementById('char-rank').innerText = `${r} (LVL ${lvl})`;
-                document.getElementById('char-img').src = `img/${data.type}_${lvl}.png`;
-            } catch(e) { console.error("Hiba!"); }
-        }
+        // Futtatás betöltéskor
+        initCharacter();
     </script>
 </body>
 </html>
