@@ -153,11 +153,52 @@ if (!userData) {
         document.getElementById('display-level').innerText = userData.level;
     }
 }
+        function updateCharacterUI(type, points, name) {
+    let level = 1;
+    let rank = "Újonc";
+    
+    // Scifi szintek meghatározása
+    if (points > 1000) { level = 5; rank = "Parancsnok"; }
+    else if (points > 600) { level = 4; rank = "Hadnagy"; }
+    else if (points > 300) { level = 3; rank = "Tisztjelölt"; }
+    else if (points > 100) { level = 2; rank = "Kadét"; }
+
+    // Megjelenítés frissítése
+    document.getElementById('student-name').innerText = name;
+    document.getElementById('char-type').innerText = type;
+    document.getElementById('char-rank').innerText = rank + " (LVL " + level + ")";
+    document.getElementById('char-points').innerText = points + " PT";
+
+    // Kép beállítása: pl. img/Tudos_3.png
+    // Figyelj rá, hogy a táblázatban is ékezet nélkül legyen: Tudos, Pilota, Harcos
+    document.getElementById('char-img').src = `img/${type}_${level}.png`;
+    
+    // XP csík (0-300, 301-600 stb. közötti haladás mutatása)
+    let progress = (points % 300) / 3; 
+    document.getElementById('xp-fill').style.width = progress + "%";
+}
+
+// Ezt a függvényt kell meghívnod az oldal betöltésekor
+async function loadCharacterData(studentName) {
+    const scriptURL = "IDE_MÁSOLD_AZ_ÚJ_SCRIPT_URL_T";
+    const finalURL = `${scriptURL}?action=getStats&name=${encodeURIComponent(studentName)}`;
+    
+    try {
+        const response = await fetch(finalURL);
+        const data = await response.json();
+        if(!data.error) {
+            updateCharacterUI(data.type, data.points, data.name);
+        }
+    } catch (e) {
+        console.error("Hiba az adatok letöltésekor");
+    }
+}
     </script>
 
 </body>
 
 </html>
+
 
 
 
