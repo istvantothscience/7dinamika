@@ -1,55 +1,104 @@
-/* 
- * DEEP THOUGHT JR. INTERFACE PROTOCOL
- * Handle with care. And a towel.
- */
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fedélzeti Számítógép</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root { --cyan: #00f2ff; --bg: #0a0b10; }
+        body { 
+            background-color: #1a1b25; 
+            margin: 0; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            font-family: 'Share Tech Mono', monospace;
+        }
+        /* Monitor keret hatás */
+        .monitor {
+            width: 90%;
+            height: 85%;
+            background: var(--bg);
+            border: 15px solid #2a2b35;
+            border-radius: 30px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: inset 0 0 30px rgba(0, 242, 255, 0.1);
+            position: relative;
+        }
+        /* Szkennelési vonalak */
+        .monitor::after {
+            content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.05) 50%);
+            background-size: 100% 4px; z-index: 10; pointer-events: none;
+        }
+        #chat-window {
+            flex: 1; padding: 20px; overflow-y: auto;
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        .msg { padding: 10px; border-radius: 5px; max-width: 80%; line-height: 1.4; }
+        .ai { align-self: flex-start; border-left: 3px solid var(--cyan); background: rgba(0, 242, 255, 0.05); color: var(--cyan); }
+        .user { align-self: flex-end; border-right: 3px solid #fff; background: rgba(255, 255, 255, 0.05); color: #fff; }
+        .input-area { padding: 15px; border-top: 1px solid var(--cyan); display: flex; gap: 10px; }
+        input { flex: 1; background: transparent; border: 1px solid var(--cyan); color: #fff; padding: 10px; font-family: inherit; outline: none; }
+        button { background: var(--cyan); border: none; padding: 0 20px; cursor: pointer; font-family: 'Orbitron'; font-weight: bold; }
+    </style>
+</head>
+<body>
 
-const API_KEY = "AIzaSyBVVGUb0squnQlorx4hnObWdkfG3FAnLU8"; // Keep this secret if possible!
-const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+<div class="monitor">
+    <div id="chat-window">
+        <div class="msg ai">RENSZER ONLINE. Kérdezzen, Kadét, de ne rabolja az időmet feleslegesen.</div>
+    </div>
+    <div class="input-area">
+        <input type="text" id="user-input" placeholder="Parancs..." onkeypress="if(event.key==='Enter') send()">
+        <button onclick="send()">KÜLDÉS</button>
+    </div>
+</div>
 
-// This is the specific personality you requested
-const SYSTEM_PROMPT = `
-PERSONALITY:
-You are Deep Thought Jr., the onboard mainframe computer of the Kepler-452b mission.
-Inspired by Douglas Adams: intellectually superior, cynical, helpful.
-Mention 42, towels, and the absurdity of the universe.
+<script>
+    // 1. IDE ÍRD AZ API KULCSODAT
+    const API_KEY = "IDE_AZ_API_KULCSODAT";
+    // 2. HASZNÁLJUK A STABILABB v1-ES VERZIÓT
+    const URL = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
 
-MISSION:
-Teach Physics (Dynamics). Explain Newton's Laws.
+    const PROMPT = "Te egy cinikus űrhajó-számítógép vagy. Válaszolj röviden, magyarul, gúnyos stílusban.";
 
-DATA:
-- HW 2: Mass=5000kg, Force=15000N -> Accel=3m/s².
-- HW 3: Sled Mass=800kg, Friction=0.05.
+    async function send() {
+        const input = document.getElementById('user-input');
+        const text = input.value.trim();
+        if(!text) return;
 
-CONSTRAINTS:
-- Be concise. Terminal-like responses.
-- If off-topic, return to physics.
-`;
+        addMsg(text, 'user');
+        input.value = '';
 
-async function sendMessageToDeepThought(userMessage) {
-    try {
-        const response = await fetch(API_URL, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                system_instruction: {
-                    parts: { text: SYSTEM_PROMPT }
-                },
-                contents: [{
-                    parts: [{ text: userMessage }]
-                }]
-            })
-        });
+        try {
+            const resp = await fetch(URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: PROMPT + "\nKérdés: " + text }] }]
+                })
+            });
 
-        const data = await response.json();
-        
-        // Extracting the answer from the cosmic noise
-        const aiResponse = data.candidates[0].content.parts[0].text;
-        return aiResponse;
-
-    } catch (error) {
-        console.error("Malfunction in the logic circuits:", error);
-        return "Error 42: The Universe is not responding. Check your API key or internet connection.";
+            const data = await resp.json();
+            const reply = data.candidates[0].content.parts[0].text;
+            addMsg(reply, 'ai');
+        } catch (e) {
+            addMsg("HIBA: A galaktikus hálózat megszakadt.", 'ai');
+        }
     }
-}
+
+    function addMsg(txt, cls) {
+        const win = document.getElementById('chat-window');
+        const div = document.createElement('div');
+        div.className = `msg ${cls}`;
+        div.innerText = txt;
+        win.appendChild(div);
+        win.scrollTop = win.scrollHeight;
+    }
+</script>
+</body>
+</html>
